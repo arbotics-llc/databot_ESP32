@@ -7,7 +7,7 @@
     {
       "chipFamily": "ESP32",
       "parts": [
-        { "path": "github.com/arbotics-llc/databot_ESP32/raw/main/Flasher/Fw/databot2.0_V2.5.bin", "offset": 0 }
+        { "path": "https://github.com/arbotics-llc/databot_ESP32/blob/main/Flasher/Fw/databot2.0_V2.5.bin?raw=true", "offset": 0 }
       ]
     }
   ]
