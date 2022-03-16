@@ -1,2 +1,1 @@
-# databot_ESP32
- databot2.0 
+# Official Arduino Library for databot2.0 by aRbotics, LLC
