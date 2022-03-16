@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>databot™</title>
+    <link rel="stylesheet" href="css/ssdbtn.css">
+    <link rel="icon" type="image/x-icon" href="fic.png">
+    <style>
+        * {
+            border: 0;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
+            background-image: linear-gradient(132deg, #d5e01a40 26%, #2783bc7a 125%);
+            margin: auto;
+            background-image: linear-gradient(302deg, #101010, #282828);
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+        }
+
+        h1 {
+            font-family: 'Alegreya Sans', sans-serif;
+            font-weight: 300;
+            margin-top: 0;
+        }
+
+        .control-group {
+            display: inline-block;
+            vertical-align: top;
+            background: rgb(44, 44, 44);
+            color: white;
+            text-align: left;
+            padding: 30px;
+            margin: 0px 30px;
+            width: 500px;
+            border-radius: 18px;
+            box-shadow: 0px 0px 18px 4px rgb(0 0 0 / 68%);
+        }
+
+        .control {
+            display: block;
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .control input {
+            position: absolute;
+            z-index: -1;
+            opacity: 0;
+        }
+
+        .control__indicator {
+            position: absolute;
+            top: 2px;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            background: #e6e6e6;
+            border-radius: 4px;
+        }
+
+        .control:hover input~.control__indicator,
+        .control input:focus~.control__indicator {
+            background: #ccc;
+        }
+
+        .control input:checked~.control__indicator {
+            background: #2aa1c0;
+        }
+
+        .control:hover input:not([disabled]):checked~.control__indicator,
+        .control input:checked:focus~.control__indicator {
+            background: #0e647d;
+        }
+
+        .control input:disabled~.control__indicator {
+            background: #e6e6e6;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .control__indicator:after {
+            content: '';
+            position: absolute;
+            display: none;
+        }
+
+        .control input:checked~.control__indicator:after {
+            display: block;
+        }
+
+        .control--checkbox .control__indicator:after {
+            left: 8px;
+            top: 4px;
+            width: 3px;
+            height: 8px;
+            border: solid #fff;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .control--checkbox input:disabled~.control__indicator:after {
+            border-color: #7b7b7b;
+        }
+
+    
+
+
+        .inputtext {
+            display: block;
+            position: relative;
+            padding-left: 2px;
+            margin-bottom: 33px;
+            margin-top: 25px;
+            font-size: 18px;
+        }
+
+        .input {
+            height: 22px;
+            font-weight: 700;
+            width: 85px;
+            transition: 0.7s;
+            border: 1px solid #a6a6a6;
+            border-top-color: #949494;
+            border-radius: 3px;
+            box-shadow: 0 1px 0 rgb(255 255 255 / 50%), 0 1px 0 rgb(0 0 0 / 7%) inset;
+            outline: 0;
+            margin-left: 8px;
+        }
+
+        .input:focus {
+            border-color: #e77600;
+            box-shadow: 0 0 3px 2px rgb(228 121 17 / 50%);
+            transition: 0.7s;
+        }
+
+        .header {
+            border-bottom: 3px solid #2886bdad;
+            padding-bottom: 22px;
+        }
+
+       
+
+        @media screen and (max-width: 4000px) {
+            .hed {
+                top: -9px;
+            }
+        }
+
+        @media screen and (max-width: 1025px) {
+            .div-label-new {
+                width: 100%;
+            }
+
+            .div-select-new {
+                width: 100%;
+                margin-bottom: 28px;
+            }
+
+            .H1 {
+                float: left;
+                font-size: 30px;
+            }
+
+            .Header {
+                padding: 20px;
+            }
+        }
+
+        @media screen and (max-width: 500px) {
+            .hed {
+                top: 7px;
+                right: 0;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="css/header-footer.css">
+</head>
+
+<body>
+    <header class="Header">
+        <div class="main-div-new">
+            <div class="main-div-1-new">
+                <div class="div-com-new div-label-new logo"> <a href="https://databot.us.com/" target="_blank"> <img
+                            style="width: 300px;" src="dbl.png" alt="NON-Inverting Amplifier Gain Calculator Image">
+                    </a> </div>
+                <div class="div-com-new div-select-new"> <a href="https://databot.us.com/" target="_blank">
+                        <h1 class="H1">Sensor Settings</h1>
+                    </a> </div>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <div class="control-group">
+            <div>
+                <p style="font-size: 18px;">When using <strong> databot&trade; </strong> offline, for example running an
+                    experiment out of range of Bluetooth or conducting a long term experiment, use this menu. Select
+                    your sensors and sample rate and your data will be written to internal memory and available for
+                    download when you conclude your experiment.</p>
+                <form action="/" style="display:inline-block; margin-top: 17px;"> <label
+                        class="control control--checkbox">Accelerometer <input type="checkbox" name="accl" />
+                        <div class="control__indicator"></div>
+                    </label> <label class="control control--checkbox">Gyroscope <input type="checkbox" name="gyro" />
+                        <div class="control__indicator"></div>
+                    </label> <label class="control control--checkbox">Magnetometer <input type="checkbox"
+                            name="magneto" />
+                        <div class="control__indicator"></div>
+                    </label> <label class="control control--checkbox">External Temperature Probe <strong>1</strong>
+                        <input type="checkbox" name="externalTemp1" />
+                        <div class="control__indicator"></div>
+                    </label> <label class="control control--checkbox">External Temperature Probe <strong>2</strong>
+                        <input type="checkbox" name="externalTemp2" />
+                        <div class="control__indicator"></div>
+                    </label> <label class="control control--checkbox">Air Pressure <input type="checkbox"
+                            name="pressure" />
+                        <div class="control__indicator"></div>
+                    </label> <label class="control control--checkbox">Altitude <input type="checkbox" name="alti" />
+                        <div class="control__indicator"></div>
+                    </label> <label class="control control--checkbox">Ambient Light <input type="checkbox"
+                            name="ambLight" />
+                        <div class="control__indicator"></div>
+                    </label> <label class="control control--checkbox">RGB Light <input type="checkbox"
+                            name="rgbLight" />
+                        <div class="control__indicator"></div>
+                    </label> <label class="control control--checkbox">UV Index <input type="checkbox" name="uvIndex" />
+                        <div class="control__indicator"></div>
+                    </label> <label class="control control--checkbox">CO2 <input type="checkbox" name="co2" />
+                        <div class="control__indicator"></div>
+                    </label> <label class="control control--checkbox">TVOC <input type="checkbox" name="voc" />
+                        <div class="control__indicator"></div>
+                    </label> <label class="control control--checkbox">Humidity <input type="checkbox" name="humidity" />
+                        <div class="control__indicator"></div>
+                    </label> <label class="control control--checkbox">Proximity - 10 cm <input type="checkbox"
+                            name="short_distance" />
+                        <div class="control__indicator"></div>
+                    </label> <label class="control control--checkbox">Proximity - 3 M <input type="checkbox"
+                            name="long_distance" />
+                        <div class="control__indicator"></div>
+                    </label> <label class="control control--checkbox">Sound Intensity (dB) <input type="checkbox"
+                            name="noise" />
+                        <div class="control__indicator"></div>
+                    </label> <label class="inputtext">Sample Rate (ms): <input class="input" type="number" value="100"
+                            id="username" name="REFERESH"> </label> <button class="btn btn-start" type="submit"
+                            name="START" $startstate$>START</button> <button class="btn btn-stop" type="submit" name="STOP"
+                            $stopstate$>STOP</button> </form>
+                <form style="display:inline-block;" action="/get">
+                     <button class="btn btn-download" type="submit"
+                        name="DOWNLOAD">DOWNLOAD</button> </form>
+            </div>
+        </div>
+    </div>
+    <style>
+        .button2:hover,.button3:hover {
+            cursor: pointer;
+        }
+
+        .button2:disabled, .button3:disabled {
+            cursor: not-allowed;
+            opacity: .30;
+        }
+        .button1:hover{
+            cursor: not-allowed;;
+        }
+    </style>
+    <footer class="footer"> <button class="button1 button-act"> <img class="icon" src="dcico.png" alt=""> </button>
+        <button  $envdashstate$ onclick="location.href='/index2.html'" class="button2"> <img class="icon" src="edico.png"
+                alt=""> </button> 
+                <button  $envdashstate$ onclick="location.href='/index3.html'"  class="button3 "> <img class="icon" src="dro.png" alt="">
+                </button>
+            </footer>
+</body>
+
+</html>

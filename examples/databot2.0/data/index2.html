@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>databot™ environment dashboard</title>
+    <link rel="stylesheet" href="css/block.css">
+    <link rel="stylesheet" href="css/header-footer.css">
+    <link rel="stylesheet" href="css/temp.css">
+    <link rel="stylesheet" href="css/bulb-light.css">
+    <link rel="icon" type="image/x-icon" href="fic.png">
+</head>
+
+<body>
+    <header class="Header">
+        <div class="main-div-new">
+            <div class="main-div-1-new">
+                <div class="div-com-new div-label-new logo"> <a href="https://databot.us.com/" target="_blank"> <img
+                            style="width: 300px;" src="dbl.png" alt="NON-Inverting Amplifier Gain Calculator Image">
+                    </a> </div>
+                <div class="div-com-new div-select-new"> <a href="https://databot.us.com/" target="_blank">
+                        <h1 class="H1">Environment Dashboard</h1>
+                    </a> </div>
+            </div>
+        </div>
+    </header>
+    <div class="DB-MMD">
+        <div class="db-rmmd">
+            <div class="db-dd DB-MD temp-flex">
+                <div>
+                    <div class="db-fd" style="display: flex; justify-content: space-between;">
+                        <h1 class="db-h1" style="font-size: 25px;">Temp</h1>
+                        <div id="thermo"></div>
+                        <h3 class="db-p">
+                            <div> <span id="temp-in-c">0</span> ºC </div><br>
+                            <div> <span id="temp-in-f">23</span> ºF </div>
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="db-dd">
+                <div class="db-dd1">
+                    <div class="db-dd1-in-1">
+                        <div class="DB-MD db-w-DB-MD">
+                            <div class="db-fd">
+                                <h1 class="db-h1">CO2</h1> <img class="db-icon" src="co2.png" />
+                                <h3 class="db-p"><span id="co2">0</span> ppm</h3>
+                            </div>
+                        </div>
+                        <div class="DB-MD db-w-DB-MD">
+                            <div class="db-fd">
+                                <h1 class="db-h1">VOC</h1> <img class="db-icon" src="voc.png" alt="">
+                                <h3 class="db-p"><span id="voc">0</span> ppb</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="db-dd1-in-2">
+                        <div class="DB-MD db-w-DB-MD">
+                            <div class="db-fd">
+                                <h1 class="db-h1">Humidity</h1> <img class="db-icon" src="h.png" alt="">
+                                <h3 class="db-p"><span id="Humidity">0</span> % RH</h3>
+                            </div>
+                        </div>
+                        <div class="DB-MD db-w-DB-MD">
+                            <div class="db-fd">
+                                <h1 class="db-h1">Air Pressure</h1> <img class="db-icon" src="ap.png" alt="">
+                                <h3 class="db-p"><span id="Air-Pressure">0</span> hPa</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="db-dd2">
+                    <div class="D">
+                        <div class="G">
+                            <div class="db-fd">
+                                <h1 class="db-h1">Air Quality Gauge</h1> <canvas
+                                    style="margin-top: 47px; margin-bottom: 20px;" id="Gaugetttt"></canvas>
+                                <h3 id="Air-Quality-value">0</h3>
+                                <h4 id="Air-Quality-type"></h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="D">
+                        <div class=" G">
+                            <div class="db-fd">
+                                <h1 class="db-h1">Ambient Light</h1>
+                                <div class="area">
+                                    <div class="wire"></div>
+                                    <div class="fixture">
+                                        <div class="strip"></div>
+                                        <div class="strip"></div>
+                                        <div class="strip"></div>
+                                    </div>
+                                    <div class="bulb" id="Bulb">
+                                        <div class="zig"></div>
+                                        <div class="zig"></div>
+                                        <div class="zig"></div>
+                                    </div>
+                                </div>
+                                <h3 class="db-p"> <span id="Ambient-light">10</span> Lux</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <style>
+        .button1:hover,  .button3:hover {
+            cursor: pointer;
+        }
+        .button2:hover{
+            cursor: not-allowed;;
+        }
+    </style>
+    <footer class="footer"> <button onclick="location.href='/'" class="button1 "> <img class="icon" src="dcico.png"
+                alt=""> </button> <button class="button2 button-act"> <img class="icon" src="edico.png" alt="">
+        </button> 
+        <button onclick="location.href='/index3.html'"  class="button3 "> <img class="icon" src="dro.png" alt="">
+        </button>
+    </footer>
+    <script src="js/Thermometer/ajax-library.js"></script>
+    <script src="js/Thermometer/temp.js"></script>
+    <script src="js/Gauge/gauge.js-library.js"></script>
+    <script src="js/Gauge/gauge.js"></script>
+    <script src="js/ajax.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,157 @@
+.Header {
+    background: linear-gradient(to bottom, black 0%, rgba(0, 0, 0, 0) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#a6000000", endColorstr="#00000000", GradientType=0);
+    display: flex;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    z-index: 5;
+}
+
+.main-div-new {
+    width: 100%;
+}
+
+.main-div-1-new {
+    font-weight: 400;
+    line-height: 1.5;
+    font-size: 18px;
+    border: 0 solid #e2e8f0;
+    box-sizing: border-box;
+    position: relative;
+    min-height: 1px;
+    float: left;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.div-com-new {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    box-sizing: border-box;
+    position: relative;
+    min-height: 1px;
+    padding-right: 15px;
+    float: left;
+}
+
+.H1 {
+    float: right;
+    color: #77777b;
+    margin: 0px;
+    transition: 0.7s;
+    font-weight: 700;
+}
+
+.H1:hover {
+    color: #ffffff;
+    text-shadow: 0 0 8px #707070;
+}
+
+.footer {
+    position: relative;
+    margin-top: 40px;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background: linear-gradient(to top, black 0%, rgba(0, 0, 0, 0) 100%);
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: 3px;
+    word-spacing: 4px;
+}
+
+.button1 , .button2, .button3{
+  margin: 15px 26px;
+background-color: #7fffd400;
+border-radius: 10px;
+border: 2px solid #888888;
+transition: 1s;
+}
+.button1:hover ,.button2:hover, .button3:hover{
+  background-color: #3b3b3b;
+  transition: 1s;
+}
+.button-act{
+  background-color: #3b3b3b;
+}
+
+
+    
+    .icon {
+      width: 60px;
+      padding: 7px 28px 0px 28px;
+      stroke: white;
+      fill: transparent;
+      stroke-width: 1pt;
+      stroke-miterlimit: 10;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 400;
+    }
+    
+
+    
+
+
+
+@media screen and (max-width: 4000px) {
+    .div-label-new {
+        width: 30%;
+        display: flex;
+    }
+
+    .div-select-new {
+        width: 70%;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    
+    }
+
+    .Header {
+        padding: 20px;
+    }
+   
+
+
+}
+
+@media screen and (max-width: 890px) {
+
+    .main-div-1-new {
+        flex-direction: column;
+    }
+
+    .div-label-new {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .div-select-new {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .div-com-new {
+        padding-right: 0;
+    }
+
+   
+
+    .H1{
+        font-size: 33px;
+    }
+    .button1, .button2, .button3{
+        margin: 14px 3px;
+    }
+    .icon{
+        width: 50px;
+        padding: 7px 15px 0px 15px;
+    }
+   
+}

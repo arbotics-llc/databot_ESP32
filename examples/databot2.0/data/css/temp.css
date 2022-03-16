@@ -1,0 +1,223 @@
+* {
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg: #e3e4e8;
+    --fg: #17181c;
+    font-size: calc(16px + (24 - 16) * (100vw - 320px) / (1280 - 320));
+}
+
+.thermometer,
+.thermometer__tube {
+    position: relative;
+}
+
+.thermometer {
+    background-image: linear-gradient(-135deg,
+            hsl(223, 10%, 85%),
+            hsl(223, 10%, 65%));
+    border-radius: 2em;
+    box-shadow: 0.2em 0 0.1em hsl(223, 10%, 45%) inset,
+        0 -0.2em 0.1em hsl(223, 10%, 45%) inset, -0.1em 0 0 hsl(223, 10%, 80%) inset,
+        0 0.1em 0 hsl(223, 10%, 80%) inset;
+    margin: auto;
+    width: 10em;
+    height: 30em;
+}
+
+.thermometer:before,
+.thermometer__inner,
+.thermometer__ring,
+.thermometer__tube:before {
+    position: absolute;
+}
+
+.thermometer:before,
+.thermometer__inner {
+    left: 1em;
+}
+
+.thermometer:before,
+.thermometer__tube:before {
+    content: "";
+    display: block;
+}
+
+.thermometer:before {
+    background-image: linear-gradient(hsl(223, 10%, 90%), hsl(223, 10%, 80%));
+    border-radius: 1.2em;
+    box-shadow: -0.1em 0.1em 0.1em hsl(223, 10%, 55%) inset,
+        0.2em -0.2em 0.4em hsl(223, 10%, 100%) inset,
+        -0.3em 0.2em 0.4em hsl(223, 10%, 55%) inset,
+        0.1em -0.1em 0.1em hsl(223, 10%, 70%), 0.5em -0.5em 0.3em hsl(223, 10%, 65%),
+        0 0 0.4em 0.4em hsl(223, 10%, 100%);
+    top: 1em;
+    width: calc(100% - 2em);
+    height: calc(100% - 2em);
+}
+
+.thermometer__inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-content: flex-start;
+    top: 2em;
+    text-align: center;
+    width: calc(100% - 2em);
+    height: calc(100% - 4em);
+}
+
+.thermometer__c,
+.thermometer__f {
+    background-image: linear-gradient(hsl(0, 0%, 0%) 0.1em,
+            hsla(0, 0%, 0%, 0) 0.1em),
+        linear-gradient(hsl(0, 0%, 0%) 0.1em, hsla(0, 0%, 0%, 0) 0.1em);
+    background-repeat: repeat-y;
+    flex-basis: calc(50% - 0.75em);
+    margin-bottom: 0.125em;
+}
+
+.thermometer__c {
+    background-position: 100% 0;
+    background-size: 0.8em 1em, 0.5em 0.2em;
+    padding-right: 0.5em;
+    padding-top: 1.25em;
+    height: 22em;
+}
+
+.thermometer__c .thermometer__label {
+    height: 2em;
+}
+
+.thermometer__f {
+    background-size: 0.8em 1.125em, 0.5em 0.225em;
+    padding-top: 1.5em;
+    padding-left: 0.25em;
+    height: 22.5em;
+}
+
+.thermometer__f .thermometer__label {
+    height: 2.25em;
+}
+
+.thermometer__mercury,
+.thermometer__tube:before {
+    height: 100%;
+}
+
+.thermometer__mercury {
+    background-color: hsl(355, 85%, 40%);
+    box-shadow: -0.1em 0.1em 0.25em hsla(355, 85%, 40%, 0.7),
+        0.05em 0 0 hsla(0, 0%, 100%, 0.5) inset;
+    width: 100%;
+    transform: scaleY(0);
+    transform-origin: 50% 100%;
+    transition: transform 0.3s ease-in-out;
+}
+
+.thermometer__ring {
+    border-radius: 50% 50% 0 0;
+    box-shadow: 0 0.05em 0 0.05em hsla(223, 10%, 30%, 0.4) inset;
+    top: 0.6em;
+    left: calc(50% - 0.3em);
+    width: 0.6em;
+    height: 0.2em;
+}
+
+.thermometer__ring+.thermometer__ring {
+    border-radius: 0 0 50% 50%;
+    box-shadow: 0 -0.05em 0 0.05em hsla(223, 10%, 30%, 0.4) inset;
+    top: 20.2em;
+}
+
+.thermometer__title {
+    flex-basis: 50%;
+}
+
+.thermometer__tube,
+.thermometer__tube:before {
+    border-radius: 0.3em 0.3em 0 0;
+}
+
+.thermometer__tube {
+    box-shadow: -0.1em 0.1em 0.25em hsla(0, 0%, 0%, 0.3),
+        0.05em 0 0 hsla(0, 0%, 100%, 0.5) inset,
+        0.1em 0 0.1em hsla(0, 0%, 0%, 0.2) inset;
+    flex-basis: 0.3em;
+}
+
+.thermometer__tube:before {
+    background: linear-gradient(hsla(0, 0%, 100%, 0.5), hsla(0, 0%, 100%, 0)) 100% 0 / 25% 100% no-repeat;
+    box-shadow: -0.05em 0 0.05em hsla(0, 0%, 0%, 0.2) inset;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1;
+}
+
+.thermometer__bulb {
+    background-image: radial-gradient(100% 100% at 65% 35%,
+            hsl(355, 85%, 55%) 12%,
+            hsl(355, 85%, 40%) 13%,
+            hsl(355, 85%, 30%));
+    border-radius: 50%;
+    box-shadow: 0 -0.25em 0.25em hsla(0, 85%, 20%, 0.7),
+        -0.35em 0.35em 0.5em hsl(355, 20%, 50%), 0 0 0 0.1em hsl(223, 10%, 60%),
+        0 0 0 0.15em hsl(223, 10%, 90%), 0 0 0 0.2em hsl(223, 10%, 30%),
+        0 0 0 0.05em hsl(355, 85%, 30%) inset, -0.1em 0.1em 0 hsl(355, 85%, 43%) inset;
+    margin: auto;
+    width: 2em;
+    height: 2em;
+}
+
+/* Dark theme */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #17181c;
+        --fg: #e3e4e8;
+    }
+
+    .thermometer {
+        background-image: linear-gradient(-135deg,
+                hsl(223, 10%, 35%),
+                hsl(223, 10%, 15%));
+        box-shadow: 0.2em 0 0.1em hsl(223, 10%, 15%) inset,
+            0 -0.2em 0.1em hsl(223, 10%, 15%) inset, -0.1em 0 0 hsl(223, 10%, 30%) inset,
+            0 0.1em 0 hsl(223, 10%, 30%) inset;
+    }
+
+    .thermometer:before {
+        background-image: linear-gradient(hsl(223, 10%, 40%), hsl(223, 10%, 30%));
+        box-shadow: -0.1em 0.1em 0.1em hsl(223, 10%, 5%) inset,
+            0.2em -0.2em 0.4em hsl(223, 10%, 40%) inset,
+            -0.3em 0.2em 0.4em hsl(223, 10%, 5%) inset,
+            0.1em -0.1em 0.1em hsl(223, 10%, 20%), 0.5em -0.5em 0.3em hsl(223, 10%, 15%),
+            0 0 0.4em 0.4em hsl(223, 10%, 40%);
+    }
+
+    .thermometer__c,
+    .thermometer__f {
+        background-image: linear-gradient(hsl(0, 0%, 100%) 0.1em,
+                hsla(0, 0%, 100%, 0) 0.1em),
+            linear-gradient(hsl(0, 0%, 100%) 0.1em, hsla(0, 0%, 100%, 0) 0.1em);
+    }
+
+    .thermometer__ring {
+        box-shadow: 0 0.05em 0 0.05em hsla(223, 10%, 80%, 0.4) inset;
+    }
+
+    .thermometer__ring+.thermometer__ring {
+        box-shadow: 0 -0.05em 0 0.05em hsla(223, 10%, 80%, 0.4) inset;
+    }
+
+    .thermometer__bulb {
+        box-shadow: 0 -0.25em 0.25em hsla(0, 85%, 20%, 0.7),
+            -0.35em 0.35em 0.5em hsl(355, 20%, 25%), 0 0 0 0.1em hsl(223, 10%, 10%),
+            0 0 0 0.15em hsl(223, 10%, 40%), 0 0 0 0.2em hsl(223, 10%, 15%),
+            0 0 0 0.05em hsl(355, 85%, 30%) inset,
+            -0.1em 0.1em 0 hsl(355, 85%, 43%) inset;
+    }
+}

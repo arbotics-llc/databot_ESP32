@@ -1,0 +1,14 @@
+{
+  "name": "databot2.0",
+  "version": "V2.5",
+  "home_assistant_domain": "databot",
+  "new_install_prompt_erase": false,
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        { "path": "https://databot.us.com/Firmware_Flash_Tool/Firmwares/databot2.0_V2.3.bin", "offset": 0 }
+      ]
+    }
+  ]
+}
