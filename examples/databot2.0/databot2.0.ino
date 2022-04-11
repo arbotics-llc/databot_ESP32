@@ -1,5 +1,11 @@
 /*
   See https://databot.us.com/setup/ for more info
+  
+  You can directly flash your databot to latest firmware from our web flashing tool check out here
+  https://databot.us.com/firmware/
+  In order to function this example code properly you will need to use an SPIFF data file to be flashed into ESP32. 
+  Use Me-no-dev ESP32FS plugin to flash SPIFF files
+  https://github.com/me-no-dev/arduino-esp32fs-plugin
 */
 
 // Uncoment below line and upload code to get serial debug outputs
