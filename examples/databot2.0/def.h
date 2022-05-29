@@ -1,4 +1,4 @@
-#define firmware_version "2.5"
+
 ExponentialFilter<float> AltitudeFilter(100, 0);
 std::string rxValue;  // used for reading BLE rx buffer
 TaskHandle_t buzz;
@@ -16,6 +16,8 @@ bool env_dash_en = false;
 bool WiFimode = false;
 bool BLEmode = false;
 bool BLOCKmode = false;
+bool DCmode = false;
+bool wifi_no_connect = false;
 
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
@@ -37,8 +39,9 @@ bool gestureInt = false;
 byte currentGesture;
 bool reset_APDS9960 = false;
 
+bool Laccl = false;
 bool accl = false;
-bool gyro = false;
+bool gyroo = false;
 bool magneto = false;
 bool IMUtemp = false;
 bool externalTemp1 = false;
@@ -83,7 +86,7 @@ boolean charging_state = false;
 float batteryVTG;
 String ESPchipID;
 
-float Ax, Ay, Az, Gx, Gy, Gz, Mx, My, Mz, Itemp, ExtTmp1, ExtTmp2;
+float A_LA,A_A,LAx, LAy, LAz, Ax, Ay, Az, Gx, Gy, Gz, Mx, My, Mz, Itemp, ExtTmp1, ExtTmp2;
 float Pressure, Altitude, Co2, VOC, Humidity, HumTemp, Distance, Noise;
 uint16_t AmbLight, RLight, GLight, BLight;
 byte UVindex;
@@ -101,10 +104,15 @@ boolean start_exp = false;
 boolean resetTime = false;
 boolean sendCSVheader = false;
 
+String WiFi_SSID, WiFi_PSS;
+
+const char* PARAM_wifi_ssid = "ssid";
+const char* PARAM_wifi_pss = "pass";
 const char* PARAM_downlode_btn = "DOWNLOAD";
 const char* PARAM_start_btn = "START";
 const char* PARAM_stop_btn = "STOP";
 const char* PARAM_REFRESH = "REFERESH";
+const char* L_ACCL = "laccl";
 const char* ACCL = "accl";
 const char* GYRO = "gyro";
 const char* MAGNETO = "magneto";
@@ -123,10 +131,10 @@ const char* HUM_TEMP  = "humidityTemp";
 const char* S_DIS  = "short_distance";
 const char* L_DIS  = "long_distance";
 const char* NOISE  = "noise";
-const char* M1 ="m1";
-const char* M2 ="m2";
-const char* M3 ="m3";
-const char* M4 ="m4";
+const char* M1 = "m1";
+const char* M2 = "m2";
+const char* M3 = "m3";
+const char* M4 = "m4";
 
 
 
@@ -168,3 +176,34 @@ int wholenote = (60000 * 4) / tempo;
 
 int divider = 0, noteDuration = 0;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+///////////////////new IMU library code
+ArduinoICM20948 IMU;
+ArduinoICM20948Settings icmSettings =
+{
+  .i2c_speed = 400000,                // i2c clock speed
+  .is_SPI = false,                    // Enable SPI, if disable use i2c
+  .cs_pin = 10,                       // SPI chip select pin
+  .spi_speed = 7000000,               // SPI clock speed in Hz, max speed is 7MHz
+  .mode = 1,                          // 0 = low power mode, 1 = high performance mode
+  .enable_gyroscope = true,           // Enables gyroscope output
+  .enable_accelerometer = true,       // Enables accelerometer output
+  .enable_magnetometer = true,        // Enables magnetometer output // Enables quaternion output
+  .enable_gravity = false,             // Enables gravity vector output
+  .enable_linearAcceleration = true,  // Enables linear acceleration output
+  .enable_quaternion6 = false,         // Enables quaternion 6DOF output
+  .enable_quaternion9 = false,         // Enables quaternion 9DOF output
+  .enable_har = false,                 // Enables activity recognition
+  .enable_steps = false,               // Enables step counter
+  .gyroscope_frequency = 5,           // Max frequency = 225, min frequency = 1
+  .accelerometer_frequency = 1,       // Max frequency = 225, min frequency = 1
+  .magnetometer_frequency = 5,        // Max frequency = 70, min frequency = 1
+  .gravity_frequency = 1,             // Max frequency = 225, min frequency = 1
+  .linearAcceleration_frequency = 1,  // Max frequency = 225, min frequency = 1
+  .quaternion6_frequency = 50,        // Max frequency = 225, min frequency = 50
+  .quaternion9_frequency = 50,        // Max frequency = 225, min frequency = 50
+  .har_frequency = 50,                // Max frequency = 225, min frequency = 50
+  .steps_frequency = 50               // Max frequency = 225, min frequency = 50
+};

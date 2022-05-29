@@ -3,10 +3,12 @@ initLED	KEYWORD2
 Dprintln	KEYWORD1
 Dprint	KEYWORD1
 initMIC	KEYWORD2
+initTOF	KEYWORD2
 IMU_read	KEYWORD2
 IMU_read_accl	KEYWORD2
 IMU_read_gyro	KEYWORD2
 IMU_read_magneto	KEYWORD2
+IMU_read_LinearAccl	KEYWORD2
 getUV	KEYWORD2
 getPressure	KEYWORD2
 getAltitude	KEYWORD2
@@ -15,3 +17,13 @@ getDistance	KEYWORD2
 readBattery	KEYWORD2
 EEPROMReadlong	KEYWORD2
 sendPacketEx KEYWORD2
+disableLightSensor	KEYWORD2
+disableGestureSensor	KEYWORD2
+enableLightSensor	KEYWORD2
+enableGestureSensor	KEYWORD2
+readRedLight	KEYWORD2
+readGreenLight	KEYWORD2
+readBlueLight	KEYWORD2
+SetCurrent	KEYWORD2
+isGestureAvailable	KEYWORD2
+readGesture	KEYWORD2

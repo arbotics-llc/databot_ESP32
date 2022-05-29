@@ -1,11 +1,14 @@
 
 void callback_Rx()
 {
+
   if (!config_done)
   {
+
     //    doc.clear();
     StaticJsonDocument<1500> doc;
     DeserializationError error = deserializeJson(doc, rxValue);
+
     if (error)
     {
       Dprint(F("deserializeJson() failed: "));
@@ -18,8 +21,9 @@ void callback_Rx()
       resolution = doc["decimal"];
       time_factor = doc["timeFactor"];
       time_decimal = doc["timeDec"];
+      Laccl = doc["Laccl"];
       accl = doc["accl"];
-      gyro = doc["gyro"];
+      gyroo = doc["gyro"];
       magneto = doc["magneto"];
       IMUtemp = doc["IMUtemp"];
       externalTemp1 = doc["Etemp1"];

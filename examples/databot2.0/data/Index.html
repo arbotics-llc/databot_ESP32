@@ -209,10 +209,14 @@
                     experiment out of range of Bluetooth or conducting a long term experiment, use this menu. Select
                     your sensors and sample rate and your data will be written to internal memory and available for
                     download when you conclude your experiment.</p>
-                <form action="/" style="display:inline-block; margin-top: 17px;"> <label
-                        class="control control--checkbox">Accelerometer <input type="checkbox" name="accl" />
+                <form action="/" style="display:inline-block; margin-top: 17px;"> 
+					<label class="control control--checkbox">Accelerometer <input type="checkbox" name="accl" />
                         <div class="control__indicator"></div>
-                    </label> <label class="control control--checkbox">Gyroscope <input type="checkbox" name="gyro" />
+                    </label>
+					<label class="control control--checkbox">Linear Accelerometer <input type="checkbox" name="laccl" />
+                        <div class="control__indicator"></div>
+                    </label>
+					<label class="control control--checkbox">Gyroscope <input type="checkbox" name="gyro" />
                         <div class="control__indicator"></div>
                     </label> <label class="control control--checkbox">Magnetometer <input type="checkbox"
                             name="magneto" />
@@ -256,8 +260,69 @@
                             name="START" $startstate$>START</button> <button class="btn btn-stop" type="submit" name="STOP"
                             $stopstate$>STOP</button> </form>
                 <form style="display:inline-block;" action="/get">
-                     <button class="btn btn-download" type="submit"
-                        name="DOWNLOAD">DOWNLOAD</button> </form>
+                     <button class="btn btn-download" type="submit" name="DOWNLOAD">DOWNLOAD</button> </form>
+            </div>
+        </div>
+    </div>
+	<style>
+ 
+
+
+
+.form input {
+  outline: 0;
+  background: #f2f2f2;
+  width: 100%;
+  border: 0;
+  border-radius: 5px;
+  margin: 0 0 15px;
+  padding: 9px 11px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+.form input:focus {
+  background: #dbdbdb;
+}
+
+
+.form button {
+    text-transform: uppercase;
+    outline: 0;
+    background: #676767;
+    width: 100%;
+    border: 0;
+    border-radius: 5px;
+    padding: 9px 0px;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 1s;
+}
+
+.form button:active ,.form button:hover {
+  background: #6fb9e7;
+  transition: 1s;
+}
+
+.form span {
+    font-size: 40px;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+
+    </style>
+    <div class="container" style="margin-top: 30px;">
+        <div class="control-group">
+            <div class="form">
+                      <form action="/wifi" class="login-form">
+                        <h2 class="db-main-h2">WiFi Settings</h2>
+                        <input name = "ssid" class="input-f" type="text" placeholder="Enter WiFi SSID" required />
+                        <input name = "pass" class="input-f" type="password" placeholder="Enter WiFi Password" required />
+                        <button type="submit">Save</button>
+                      </form>
             </div>
         </div>
     </div>

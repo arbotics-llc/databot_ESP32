@@ -37,7 +37,10 @@ This program is free software: you can redistribute it and/or modify
 #include "libs/ArduinoJson.h"
 #include "libs/DallasTemperature.h"
 #include "libs/SparkFun_SGP30_Arduino_Library.h"    // for C0
-#include "libs/ICM_20948.h" // for IMU 
+
+//#include "libs/ICM_20948.h" // for IMU  removed this library as we needed more features dmp from IMU after V2.5
+#include "libs/Arduino-ICM20948.h"   // new library for the IMU which supports DMP features.
+
 #define ICM_20948_ADD 0      // The value of the last bit of the I2C address.
 #include "libs/SparkFun_APDS9960.h"
 #include "libs/SparkFun_SHTC3.h"
@@ -69,9 +72,9 @@ This program is free software: you can redistribute it and/or modify
 extern std::string rxValue;
 	
 
-
+#define LENGTH(x) (strlen(x) + 1)
 // define the number of bytes you want to access
-#define EEPROM_SIZE 50
+#define EEPROM_SIZE 100
 
 #define ESP_getChipId()   ((uint32_t)ESP.getEfuseMac())
 
@@ -142,13 +145,14 @@ void callback_Rx();
 //DS18B20 external temperature sensor helper function
 float getExternalTemperature(DallasTemperature &tempsensor);
 
-// 
-bool IMU_read(ICM_20948_I2C &imu,float &AX,float &AY,float &AZ,float &GX,float &GY,float &GZ,float &MX,float &MY,float &MZ,float &TMP);
-
-bool IMU_read_accl(ICM_20948_I2C &imu,float &AX,float &AY,float &AZ);
-bool IMU_read_gyro(ICM_20948_I2C &imu,float &GX,float &GY,float &GZ);
-bool IMU_read_magneto(ICM_20948_I2C &imu,float &MX,float &MY,float &MZ);
-bool IMU_read_magneto(ICM_20948_I2C &imu,float &TMP);
+// no temperature data available in new library
+//bool IMU_read(ArduinoICM20948 &imu,float &AX,float &AY,float &AZ,float &GX,float &GY,float &GZ,float &MX,float &MY,float &MZ,float &TMP);
+//bool IMU_read(ArduinoICM20948 &imu,float &AX,float &AY,float &AZ,float &GX,float &GY,float &GZ,float &MX,float &MY,float &MZ);
+bool IMU_read_accl(ArduinoICM20948 &imu,float &AX,float &AY,float &AZ);
+bool IMU_read_LinearAccl(ArduinoICM20948 &imu,float &AX,float &AY,float &AZ);
+bool IMU_read_gyro(ArduinoICM20948 &imu,float &GX,float &GY,float &GZ);
+bool IMU_read_magneto(ArduinoICM20948 &imu,float &MX,float &MY,float &MZ);
+//bool IMU_read_temp(ArduinoICM20948 &imu,float &TMP); // not available in the new library
 
 void initLED(Adafruit_NeoPixel &led);
 
@@ -166,6 +170,8 @@ void appendFile(fs::FS &fs, const char * path, const char * message);
 */
 void EEPROMWritelong(int address, long value);
 long EEPROMReadlong(long address);
+void EEPROMwriteString(const char* toStore, int startAddr);
+String EEPROMreadStringFromFlash(int startAddr);
 
 //SHTC3 humidity sensor helper functions
 double RHtoAbsolute(float relHumidity, float tempC);

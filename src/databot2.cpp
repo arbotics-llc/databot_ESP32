@@ -242,41 +242,92 @@ float getExternalTemperature(DallasTemperature &tempsensor) {
 	11) float pointer address for Temp
 	
 */
-bool IMU_read(ICM_20948_I2C &imu,float &AX,float &AY,float &AZ,float &GX,float &GY,float &GZ,float &MX,float &MY,float &MZ, float &TMP)
+//bool IMU_read(ArduinoICM20948 &imu,float &AX,float &AY,float &AZ,float &GX,float &GY,float &GZ,float &MX,float &MY,float &MZ, float &TMP)
+/*
+bool IMU_read(ArduinoICM20948 &imu,float &AX,float &AY,float &AZ,float &GX,float &GY,float &GZ,float &MX,float &MY,float &MZ)
 {
+	
+		byte error = 1;
+		float a,b,c;
+		imu.task();
+		if (imu.accelDataIsReady())
+		{
+			imu.readAccelData(&a, &b, &c);
+			AX = a*9.80665;
+			AY = b*9.80665;
+			AZ = c*9.80665;
+			return true;
+		}
+		else
+		{
+			error = 0;
+		}
+		if (imu.gyroDataIsReady())
+		{
+			imu.readGyroData(&a, &b, &c);
+			GX=a;
+			GY=b;
+			GZ=c;
+			return true;
+		}
+		else
+		{
+			error = 0;
+		}
+		if (imu.magDataIsReady())
+		{
+			imu.readMagData(&a, &b, &c);
+			MX=a;
+			MY=b;
+			MZ=c;
+			return true;
+		}
+		else
+		{
+			error = 0;
+		}
+		
+		if(error)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+}
+*/
+	
+/*
+	will only read the acclerometer readings from IMU
+*/
+	
+bool IMU_read_accl(ArduinoICM20948 &imu,float &AX,float &AY,float &AZ)
+{
+	/*//old IMU library code
 	if(imu.dataReady())
 	{
 		imu.getAGMT();
 		AX= imu.accX() * 0.00980665;
 		AY= imu.accY() * 0.00980665;
 		AZ= imu.accZ() * 0.00980665;
-		GX = imu.gyrX()*DEG_TO_RAD;
-		GY = imu.gyrY()*DEG_TO_RAD;
-		GZ = imu.gyrZ()*DEG_TO_RAD;
-		MX = imu.magX();
-		MY = imu.magY();
-		MZ = imu.magZ();
-		TMP = imu.temp();
 		return true;
 	}
 	else
 	{
 		return false;
 	}
-}
-
-/*
-	will only read the acclerometer readings from IMU
-*/
+	*/
 	
-bool IMU_read_accl(ICM_20948_I2C &imu,float &AX,float &AY,float &AZ)
-{
-	if(imu.dataReady())
+	// new IMU library code
+	float a,b,c;
+	imu.task();
+	if (imu.accelDataIsReady())
 	{
-		imu.getAGMT();
-		AX= imu.accX() * 0.00980665;
-		AY= imu.accY() * 0.00980665;
-		AZ= imu.accZ() * 0.00980665;
+		imu.readAccelData(&a, &b, &c);
+		AX = a*9.80665;
+		AY = b*9.80665;
+		AZ = c*9.80665;
 		return true;
 	}
 	else
@@ -287,8 +338,9 @@ bool IMU_read_accl(ICM_20948_I2C &imu,float &AX,float &AY,float &AZ)
 /*
 	will only read the gyro readings from IMU
 */
-bool IMU_read_gyro(ICM_20948_I2C &imu,float &GX,float &GY,float &GZ)
-{
+bool IMU_read_gyro(ArduinoICM20948 &imu,float &GX,float &GY,float &GZ)
+{ 
+	/*//old IMU library code
 	if(imu.dataReady())
 	{
 		imu.getAGMT();
@@ -301,12 +353,29 @@ bool IMU_read_gyro(ICM_20948_I2C &imu,float &GX,float &GY,float &GZ)
 	{
 		return false;
 	}
+	*/
+	// new IMU library code
+	float a,b,c;
+	imu.task();
+	if (imu.gyroDataIsReady())
+	{
+		imu.readGyroData(&a, &b, &c);
+		GX=a;
+		GY=b;
+		GZ=c;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 /*
 	will only read the magneto readings from IMU
 */
-bool IMU_read_magneto(ICM_20948_I2C &imu,float &MX,float &MY,float &MZ)
+bool IMU_read_magneto(ArduinoICM20948 &imu,float &MX,float &MY,float &MZ)
 {
+	/*//old IMU library code
 	if(imu.dataReady())
 	{
 		imu.getAGMT();
@@ -319,12 +388,49 @@ bool IMU_read_magneto(ICM_20948_I2C &imu,float &MX,float &MY,float &MZ)
 	{
 		return false;
 	}
+	*/
+	// new IMU library code
+	float a,b,c;
+	imu.task();
+	if (imu.magDataIsReady())
+	{
+		imu.readMagData(&a, &b, &c);
+		MX=a;
+		MY=b;
+		MZ=c;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 /*
+	will only read the linear acclerometer readings from IMU
+*/
+bool IMU_read_LinearAccl(ArduinoICM20948 &imu,float &AX,float &AY,float &AZ)
+{
+	float a,b,c;
+	imu.task();
+	if (imu.linearAccelDataIsReady())
+	{
+		imu.readLinearAccelData(&a, &b, &c);
+		AX = a*9.80665;
+		AY = b*9.80665;
+		AZ = c*9.80665;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+/*
 	will only read the Temp readings from IMU
 */
-bool IMU_read_magneto(ICM_20948_I2C &imu,float &TMP)
+/*  // not available in new library
+bool IMU_read_temp(ArduinoICM20948 &imu,float &TMP)
 {
 	if(imu.dataReady())
 	{
@@ -337,7 +443,7 @@ bool IMU_read_magneto(ICM_20948_I2C &imu,float &TMP)
 		return false;
 	}
 }
-
+*/
 /*
   Function: getUV() 
   type: byte
@@ -847,6 +953,38 @@ long EEPROMReadlong(long address)
 
   //Return the recomposed long by using bitshift.
   return ((four << 0) & 0xFF) + ((three << 8) & 0xFFFF) + ((two << 16) & 0xFFFFFF) + ((one << 24) & 0xFFFFFFFF);
+}
+
+/*
+function: EEPROMwriteString
+it will write string data to EEPROM storage 
+*/
+void EEPROMwriteString(const char* toStore, int startAddr)
+{
+	int i = 0;
+	for (; i < LENGTH(toStore); i++) {
+		EEPROM.write(startAddr + i, toStore[i]);
+	}
+	EEPROM.write(startAddr + i, '\0');
+	EEPROM.commit();
+}
+
+
+/*
+function: EEPROMreadStringFromFlash
+it will read String data to EEPROM storage 
+*/
+String EEPROMreadStringFromFlash(int startAddr)
+{
+	char in[128];
+	char curIn;
+	int i = 0;
+	curIn = EEPROM.read(startAddr);
+	for (; i < 128; i++) {
+		curIn = EEPROM.read(startAddr + i);
+		in[i] = curIn;
+	}
+	return String(in);
 }
 
 

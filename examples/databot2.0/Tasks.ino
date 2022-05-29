@@ -60,6 +60,9 @@ void Task1code( void * parameter ) {
 
 void Task2code( void * parameter ) {
   for (;;) {
+    //    RGBled.setPixelColor(0, RGBled.Color(random(0, 255), random(0, 255), random(0, 255)));
+    //    RGBled.setPixelColor(1, RGBled.Color(random(0, 255), random(0, 255), random(0, 255)));
+    //    RGBled.setPixelColor(2, RGBled.Color(random(0, 255), random(0, 255), random(0, 255)));
     RGBled.setPixelColor(0, RGBled.Color(255, 0, 0));
     RGBled.setPixelColor(1, RGBled.Color(0, 0, 255));
     RGBled.setPixelColor(2, RGBled.Color(0, 0, 255));

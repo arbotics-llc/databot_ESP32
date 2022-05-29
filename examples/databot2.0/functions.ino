@@ -111,65 +111,55 @@ void readSensors()
     VOC = 0;
   }
 
-  if (accl && gyro && magneto)
+  if (accl)
   {
-    Dprintln("AGM measure");
-    IMU_read(IMU, Ax, Ay, Az, Gx, Gy, Gz, Mx, My, Mz, Itemp);
-    dataFormate += "asfxyzijk";
-    if (IMUtemp)
-    {
-      dataFormate += "o";
-    }
-    else
-    {
-      Itemp = 0;
-    }
+    dataFormate += "asfA";
+    IMU_read_accl(IMU, Ax, Ay, Az);
+    A_A = sqrt((Ax * Ax) + (Ay * Ay) + (Az * Az));
   }
   else
   {
-    if (accl)
-    {
-      dataFormate += "asf";
-      IMU_read_accl(IMU, Ax, Ay, Az);
-    }
-    else
-    {
-      Ax = 0;
-      Ay = 0;
-      Az = 0;
-    }
-    if (gyro)
-    {
-      dataFormate += "xyz";
-      IMU_read_gyro(IMU,  Gx, Gy, Gz);
-    }
-    else
-    {
-      Gx = 0;
-      Gy = 0;
-      Gz = 0;
-    }
-    if (magneto)
-    {
-      dataFormate += "ijk";
-      IMU_read_magneto(IMU, Mx, My, Mz);
-    }
-    else
-    {
-      Mx = 0;
-      My = 0;
-      Mz = 0;
-    }
-    if (IMUtemp)
-    {
-      dataFormate += "o";
-      IMU_read_magneto(IMU, Itemp);
-    }
-    else
-    {
-      Itemp = 0;
-    }
+    Ax = 0;
+    Ay = 0;
+    Az = 0;
+    A_A = 0;
   }
+  if (gyroo)
+  {
+    dataFormate += "xyz";
+    IMU_read_gyro(IMU,  Gx, Gy, Gz);
+  }
+  else
+  {
+    Gx = 0;
+    Gy = 0;
+    Gz = 0;
+  }
+  if (magneto)
+  {
+    dataFormate += "ijk";
+    IMU_read_magneto(IMU, Mx, My, Mz);
+  }
+  else
+  {
+    Mx = 0;
+    My = 0;
+    Mz = 0;
+  }
+  if (Laccl)
+  {
+    dataFormate += "XYZL";
+    IMU_read_LinearAccl(IMU, LAx, LAy, LAz);
+    A_LA = sqrt((LAx * LAx) + (LAy * LAy) + (LAz * LAz));
+  }
+  else
+  {
+    LAx = 0;
+    LAy = 0;
+    LAz = 0;
+    A_LA = 0;
+  }
+  //  }
 
   if (ambLight)
   {
@@ -361,10 +351,6 @@ void readSensors()
     {
       vTaskResume(buzz);
       vTaskResume(led);
-      //      RGBled.setPixelColor(0, RGBled.Color(random(0, 255), random(0, 255), random(0, 255)));
-      //      RGBled.setPixelColor(1, RGBled.Color(random(0, 255), random(0, 255), random(0, 255)));
-      //      RGBled.setPixelColor(2, RGBled.Color(random(0, 255), random(0, 255), random(0, 255)));
-      //      RGBled.show();
     }
     dataFormate += "BEV";
     batteryVTG = readBattery(true);
@@ -372,12 +358,6 @@ void readSensors()
     ESPchipID = String(ESP_getChipId());
     Dprintln(ESPchipID);
   }
-  //  else
-  //  {
-  //    batteryVTG = 0;
-  //    ESPchipID = "";
-  //  }
-
 }
 
 
@@ -389,10 +369,13 @@ String generateCsvHeader() {
   String csvHeader = "Time";
   if (accl)
   {
-    csvHeader += delimiter + "a.x" + delimiter + "a.y" + delimiter + "a.z";
+    csvHeader += delimiter + "a.x" + delimiter + "a.y" + delimiter + "a.z" + delimiter + "a.a";
   }
-
-  if (gyro)
+  if (Laccl)
+  {
+    csvHeader += delimiter + "la.x" + delimiter + "la.y" + delimiter + "la.z" + delimiter + "la.a";
+  }
+  if (gyroo)
   {
     csvHeader += delimiter + "g.x" + delimiter + "g.y" + delimiter + "g.z";
   }
@@ -481,10 +464,13 @@ String generateCsvRecord() {
 
   if (accl)
   {
-    csvRecord += delimiter + Ax + delimiter + Ay + delimiter + Az;
+    csvRecord += delimiter + Ax + delimiter + Ay + delimiter + Az + delimiter + A_A;
   }
-
-  if (gyro)
+  if (Laccl)
+  {
+    csvRecord += delimiter + LAx + delimiter + LAy + delimiter + LAz + delimiter + A_LA;
+  }
+  if (gyroo)
   {
     csvRecord += delimiter + Gx + delimiter + Gy + delimiter + Gz;
   }
@@ -599,8 +585,9 @@ void reset_config()
   time_decimal = 2;
 
 
+  Laccl = false;
   accl = false;
-  gyro = false;
+  gyroo = false;
   magneto = false;
   IMUtemp = false;
   externalTemp1 = false;
@@ -643,7 +630,11 @@ void LED_breadh()
     blink_milli = millis();
     if (!brighter)
     {
-      if (breadhColor < 255)
+      if (breadhColor < 255 && !DCmode)
+      {
+        breadhColor++;
+      }
+      else if (breadhColor < 128 && DCmode)
       {
         breadhColor++;
       }
@@ -671,6 +662,11 @@ void LED_breadh()
     {
       RGBled.setPixelColor(0, RGBled.Color(0, breadhColor, 0));
     }
+    else if (DCmode)
+    {
+      RGBled.setPixelColor(0, RGBled.Color(breadhColor, 0, breadhColor));
+    }
+
     if (charging_state)
     {
       RGBled.setPixelColor(2, RGBled.Color(breadhColor, 0, 0));
@@ -689,7 +685,14 @@ void set_bot_mode()
   byte counter = 0;
 here:
   counter++;
+  delay(50);
   IMU_read_accl(IMU, Ax, Ay, Az);
+  Dprint("Ax:");
+  Dprintln(Ax);
+  Dprint("Ay:");
+  Dprintln(Ay);
+  Dprint("Az:");
+  Dprintln(Az);
 
   if (Az < -7) //Wi-Fi mode on
   {
@@ -813,9 +816,13 @@ here:
         {
           accl = true;
         }
+        else if (p->name() == L_ACCL)
+        {
+          Laccl = true;
+        }
         else if (p->name() == GYRO)
         {
-          gyro = true;
+          gyroo = true;
         }
         else if (p->name() == MAGNETO)
         {
@@ -920,6 +927,27 @@ here:
       {
         request->send(SPIFFS, "/EXP_DATA.csv", "text/html", true);
       }
+    });
+
+    server.on("/wifi", HTTP_GET, [] (AsyncWebServerRequest * request) {
+      int params = request->params();
+      for (int i = 0; i < params; i++) {
+        AsyncWebParameter* p = request->getParam(i);
+        // p->value().c_str());
+        if (p->name() == PARAM_wifi_ssid)
+        {
+          WiFi_SSID = p->value();
+          Dprintln(WiFi_SSID);
+          EEPROMwriteString(WiFi_SSID.c_str(), 30);
+        }
+        else if (p->name() == PARAM_wifi_pss)
+        {
+          WiFi_PSS = p->value();
+          Dprintln(WiFi_PSS);
+          EEPROMwriteString(WiFi_PSS.c_str(), 60);
+        }
+      }
+      request->send(SPIFFS, "/Index.html", String(), false, processor);
     });
 
     // all CSS files
@@ -1059,10 +1087,25 @@ here:
     RGBled.setPixelColor(2, RGBled.Color(0, 0, 0));
     RGBled.show();
 
-    //add all block setup code here 
-    
-    /////////////////////////////////////////////////////////////
+    //add all block setup code here
 
+    /////////////////////////////////////////////////////////////
+  }
+  else if (Ax > 7)
+  {
+    DCmode = true;
+    WiFi.begin(WiFi_SSID.c_str(), WiFi_PSS.c_str());
+    unsigned long tempmillis = millis();
+    while (WiFi.status() != WL_CONNECTED && millis() - tempmillis <= 20000 ) {
+      Dprint(".");
+      LED_breadh();
+    }
+    if (WiFi.status() == WL_CONNECTED)
+    {
+      Dprintln("**");
+      RGBled.setPixelColor(0, RGBled.Color(128, 0, 128));
+      RGBled.show();
+    }
   }
   else if (Az > 7 || counter == 4) //BLE mode on
   {
@@ -1119,6 +1162,11 @@ void form_packet()
   packet[F("G")] = currentGesture;
   packet[F("R")] = rx_state;
   packet[F("T")] = tx_state;
+  packet[F("X")] = LAx;
+  packet[F("Y")] = LAy;
+  packet[F("Z")] = LAz;
+  packet[F("A")] = A_A;   // absalute accleration
+  packet[F("L")] = A_LA;  // absalute linear accleration
 
   if (BLEmode)
   {

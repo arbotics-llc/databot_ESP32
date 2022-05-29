@@ -3,11 +3,13 @@
   
   You can directly flash your databot to latest firmware from our web flashing tool check out here
   https://databot.us.com/firmware/
-  In order to function this example code properly you will need to use an SPIFF data file to be flashed into ESP32. 
-  Use Me-no-dev ESP32FS plugin to flash SPIFF files
+  
+  All Web pages that are served by databot2.0 in WiFi mode are stored in SPIFF memory of ESP32 therefore:
+  Use Me-no-dev ESP32FS plugin to flash SPIFF web files
   https://github.com/me-no-dev/arduino-esp32fs-plugin
 */
 
+#define firmware_version "2.8"
 // Uncoment below line and upload code to get serial debug outputs
 //#define debug
 #include<databot2.h>
@@ -20,7 +22,10 @@ OneWire oneWire2(23);
 DallasTemperature tempsensor1(&oneWire);
 DallasTemperature tempsensor2(&oneWire2);
 SGP30 sgp30;
-ICM_20948_I2C IMU; // ICM_20948_I2C object
+
+//ICM_20948_I2C IMU; // ICM_20948_I2C object
+
+
 SparkFun_APDS9960 apds = SparkFun_APDS9960();   // light sensor object
 SHTC3 mySHTC3;    //humidity and temp          // Declare an instance of the SHTC3 class
 Adafruit_NeoPixel RGBled = Adafruit_NeoPixel(3, LED_PIN, NEO_GRB + NEO_KHZ800);
@@ -29,6 +34,7 @@ AsyncWebServer server(80);
 IPAddress AP_LOCAL_IP(192, 168, 1, 160);
 IPAddress AP_GATEWAY_IP(192, 168, 1, 4);
 IPAddress AP_NETWORK_MASK(255, 255, 255, 0);
+
 
 void IRAM_ATTR chargingLED();
 
@@ -65,6 +71,8 @@ void setup() {
   {
     EEPROMWritelong(10, 0);
     EEPROMWritelong(20, 0);
+    EEPROMwriteString("connect me", 30);
+    EEPROMwriteString("12345678", 60);
     EEPROM.write(3, 123);
     EEPROM.commit();
   }
@@ -98,16 +106,22 @@ void setup() {
   sgp30.setHumidity(doubleToFixedPoint(RHtoAbsolute(mySHTC3.toPercent(), mySHTC3.toDegC())));
 
 
-  //IMU init
-  IMU.begin(Wire, ICM_20948_ADD);
 
-  Dprint(F("Initialization of the sensor returned: "));
-  Dprintln(IMU.statusString());
-  if (IMU.status != ICM_20948_Stat_Ok)
-  {
-    Dprintln("Trying again...");
-    delay(500);
-  }
+  ///////////old IMU code
+  /*
+    //IMU init
+    IMU.begin(Wire, ICM_20948_ADD);
+
+    Dprint(F("Initialization of the sensor returned: "));
+    Dprintln(IMU.statusString());
+    if (IMU.status != ICM_20948_Stat_Ok)
+    {
+      Dprintln("Trying again...");
+      delay(500);
+    }
+  */
+  ///////////New IMU library code
+  IMU.init(icmSettings);
 
   pinMode(APDS9960_INT, INPUT);
 
@@ -172,6 +186,13 @@ void setup() {
   Dprint("HUM Calibration value: ");
   Dprintln(HumCalib);
 
+  WiFi_SSID = EEPROMreadStringFromFlash(30);
+  WiFi_PSS = EEPROMreadStringFromFlash(60);
+  Dprint("SSID:");
+  Dprintln(WiFi_SSID);
+  Dprint("PSS:");
+  Dprintln(WiFi_PSS);
+
   creatTask();
   set_bot_mode();
 
@@ -179,13 +200,26 @@ void setup() {
 
 void loop() {
 
-  while(BLOCKmode)
+  while (BLOCKmode)
   {
-     // all loop  code in block mode add here
+    // all loop  code in block mode add here
 
-     ///////////////////////////////////////
+    ///////////////////////////////////////
   }
-  
+
+  if (DCmode && WiFi.status() != WL_CONNECTED)
+  {
+    wifi_no_connect = true;
+    RGBled.setPixelColor(0, RGBled.Color(255, 0, 0));
+    RGBled.show();
+    delay(5000);
+  }
+  else if(DCmode)
+  {
+    return;
+  }
+
+
   readSensors();
   // notify changed value
   if (isConnected() || start_exp)
