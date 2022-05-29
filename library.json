@@ -4,7 +4,7 @@
    "description":"this library gets your databot running to collect sensor data for your experiments",
    "repository":{
       "type":"git",
-      "url":"https://github.com/arbotics-llc/databot_arduino"
+      "url":"https://github.com/arbotics-llc/databot_ESP32"
    },
    "authors":{
       "name":"aRbotics, LLC",
@@ -17,5 +17,5 @@
    "platforms":[
       "esp32"
    ],
-   "version":"3.5"
+   "version":"2.8"
 }
