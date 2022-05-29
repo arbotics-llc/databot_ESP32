@@ -1,4 +1,4 @@
-# Official Arduino Library for databot2.0 by aRbotics, LLC
+# Official Arduino Library for databot™ 2.0 by aRbotics, LLC
 
 <img src="https://databot.us.com/wp-content/uploads/2022/02/2.0-science-1.png">
 
