@@ -10,8 +10,8 @@ Databot is an innovative STEM education product based on the open source Arduino
 platform. It is a small cube form factor, 42.5mm3, that contains 16 built in sensors for
 experimentation, plus ports for expansion. This library and the sketches within it have
 been designed to work “out of the box” with databot so that busy teachers can be up
-and running quickly with activities for students. Databot is based on the Arduino Uno so
-these libraries and sketches should work for anyone with an an Arduino Uno and the
+and running quickly with activities for students. Databot is based on the Arduino ESP32 so
+these libraries and sketches should work for anyone with an an Arduino ESP32 Board and the
 sensors specified here if you want to build your own and modify the sketches
 accordingly. We recommend shopping with Arduino, Sparkfun, and Adafruit for your
 Uno, sensors, and components if you do this as we all benefit from the incredible open
