@@ -7,7 +7,7 @@ Get the companion android app here: https://play.google.com/store/apps/details?i
 Learn about databot at https://databot.us.com](https://play.google.com/store/apps/details?id=de.rwth_aachen.vizeey
 
 Databot is an innovative STEM education product based on the open source Arduino
-platform. It is a small cube form factor, 42.5mm3, that contains 11 built in sensors for
+platform. It is a small cube form factor, 42.5mm3, that contains 16 built in sensors for
 experimentation, plus ports for expansion. This library and the sketches within it have
 been designed to work “out of the box” with databot so that busy teachers can be up
 and running quickly with activities for students. Databot is based on the Arduino Uno so
