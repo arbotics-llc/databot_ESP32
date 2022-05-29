@@ -1,6 +1,6 @@
 # Official Arduino Library for databot2.0 by aRbotics, LLC
 
-<img src="https://user-images.githubusercontent.com/11873812/58820528-1146ab00-85f0-11e9-9428-e806057bedad.jpg?sanitize=true">
+<img src="https://databot.us.com/wp-content/uploads/2022/02/2.0-science-1.png">
 
 Get the companion android app here: https://play.google.com/store/apps/details?id=com.arbotics.databots.sciencejournal
 
