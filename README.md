@@ -6,33 +6,30 @@ Get the companion android app here: https://play.google.com/store/apps/details?i
 
 Learn about databot at https://databot.us.com
 
-Databot is an innovative STEM education product based on the open source Arduino
-platform. It is a small cube form factor, 42.5mm3, that contains 16 built in sensors for
+databot™ is an innovative STEM education product based on the open source Arduino
+platform. It is a small form factor, 42.5mm x 42.5mm x 20mm, that contains 16 built in sensors for
 experimentation, plus ports for expansion. This library and the sketches within it have
-been designed to work “out of the box” with databot so that busy teachers can be up
-and running quickly with activities for students. Databot is based on the Arduino ESP32 so
+been designed to work “out of the box” with databot™ so that busy teachers can be up
+and running quickly with activities for students. databot™ 2.0 is based on the Arduino ESP32 so
 these libraries and sketches should work for anyone with an an Arduino ESP32 Board and the
 sensors specified here if you want to build your own and modify the sketches
 accordingly. We recommend shopping with Arduino, Sparkfun, and Adafruit for your
-Uno, sensors, and components if you do this as we all benefit from the incredible open
+ESP32, sensors, and components if you do this as we all benefit from the incredible open
 source resources they have contributed to the Arduino community.
 
-This initial release of the databot library includes the following features:
+This initial release of the databot™ library includes the following features:
 
-- Complete libraries and sample sketches required to conduct educational activities using
-the Arduino IDE with databot or a compatible Arduino board with the appropriate
+- Complete libraries and sample sketches required to experiment and conduct educational activities using
+the Arduino IDE with databot™ or a compatible ESP32 board with the appropriate
 sensors.
 
-- A set of sketches built and tested with the Android version of Google Science Journal, a
-free software initiative supported by Google that enables students to create and maintain
-a digital science journal capturing data from the internal smart device sensors. Using the
-free databot Link Android App, available on the Google Playstore, you can now easily
-connect databot or other Arduino Uno compatible projects to Google Science Journal.
+- A set of sketches built and tested with the Vizeey™ app, an open source IOS/Android app that enables the creation of easy-to-use experiments for classroom use.  Vizeey™ is based on Phyphox, an open source software initiative from RWTH Aachen University.
+
 
 This library is released to the public under the GPL3 license and can be adapted as
 desired for any other purposes, including commercial use. Read the license for details.
 A great deal of time, resources, and risk have been involved by all the parties involved
-in developing databot. We ask that you buy databot products and recommend them to
+in developing databot™. We ask that you buy databot™ products and recommend them to
 your teacher friends to help support our continuing work!
 
 # Getting Started
@@ -43,7 +40,7 @@ install the most current version through the IDE.
 
 # Contributing
 Email us at contact@databot.us.com if you are interested in contributing to the official
-library, providing awesome sample sketches for databot, or have suggestions. Thanks
+library, providing awesome sample sketches for databot™, or have suggestions. Thanks
 for your support!
 
 # License
@@ -56,7 +53,5 @@ most inspirational community of users on the planet.
 for guidance and open source code that helped make databot possible.
 - Adafruit.com - a champion for electronics education and another major resource
 that helped databot come to fruition.
-- Google and their Making and Science Initiative for the build and release of
-Science Journal, a remarkably user friendly app that makes real science and real
-data more approachable for teachers and students.
+- Dr. Sebastian Staacks and RWTH Aaachen University for the remarkable contribution of Phyphox to the global science education community.
 - And Many others who contributed code to the Arduino ecosystem.
