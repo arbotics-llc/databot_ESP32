@@ -1,12 +1,14 @@
-// ArduinoJson - arduinojson.org
-// Copyright Benoit Blanchon 2014-2019
+// ArduinoJson - https://arduinojson.org
+// Copyright © 2014-2022, Benoit BLANCHON
 // MIT License
 
 #pragma once
 
-#include "../Variant/SlotFunctions.hpp"
-#include "Pair.hpp"
+// #include <ArduinoJson/Object/Pair.hpp>
+// #include <ArduinoJson/Variant/SlotFunctions.hpp>
 
+#include "../Object/Pair.hpp"
+#include "../Variant/SlotFunctions.hpp"
 namespace ARDUINOJSON_NAMESPACE {
 
 class PairPtr {

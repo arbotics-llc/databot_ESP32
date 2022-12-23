@@ -191,6 +191,18 @@ std::string getValues()
 }
 
 
+/*
+	Getting ESP unique ID
+*/
+
+uint32_t ESP_getChipId()
+{
+	uint32_t chipId = 0;
+	for(int i=0; i<17; i=i+8) {
+	  chipId |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
+	}
+	return chipId;
+}
 
 /*
 * Function getExternalTemperature
@@ -299,6 +311,10 @@ bool IMU_read(ArduinoICM20948 &imu,float &AX,float &AY,float &AZ,float &GX,float
 */
 	
 /*
+	
+
+
+/*
 	will only read the acclerometer readings from IMU
 */
 	
@@ -335,6 +351,22 @@ bool IMU_read_accl(ArduinoICM20948 &imu,float &AX,float &AY,float &AZ)
 		return false;
 	}
 }
+
+bool IMU_read_accl(MPU9250 &imu,float &AX,float &AY,float &AZ)
+{
+	if (imu.update())
+	{
+		AX = imu.getAccX()*9.80665;
+		AY = imu.getAccY()*9.80665;
+		AZ = imu.getAccZ()*9.80665;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 /*
 	will only read the gyro readings from IMU
 */
@@ -370,6 +402,22 @@ bool IMU_read_gyro(ArduinoICM20948 &imu,float &GX,float &GY,float &GZ)
 		return false;
 	}
 }
+
+bool IMU_read_gyro(MPU9250 &imu,float &GX,float &GY,float &GZ)
+{
+	if (imu.update())
+	{
+		GX=imu.getGyroX();
+		GY=imu.getGyroY();
+		GZ=imu.getGyroZ();
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 /*
 	will only read the magneto readings from IMU
 */
@@ -405,7 +453,20 @@ bool IMU_read_magneto(ArduinoICM20948 &imu,float &MX,float &MY,float &MZ)
 		return false;
 	}
 }
-
+bool IMU_read_magneto(MPU9250 &imu,float &MX,float &MY,float &MZ)
+{
+	if (imu.update())
+	{
+		MX=imu.getMagX();
+		MY=imu.getMagY();
+		MZ=imu.getMagZ();
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 /*
 	will only read the linear acclerometer readings from IMU
 */
@@ -419,6 +480,20 @@ bool IMU_read_LinearAccl(ArduinoICM20948 &imu,float &AX,float &AY,float &AZ)
 		AX = a*9.80665;
 		AY = b*9.80665;
 		AZ = c*9.80665;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+bool IMU_read_LinearAccl(MPU9250 &imu,float &AX,float &AY,float &AZ)
+{
+	if (imu.update())
+	{
+		AX = imu.getLinearAccX()*9.80665;
+		AY = imu.getLinearAccY()*9.80665;
+		AZ = imu.getLinearAccZ()*9.80665;
 		return true;
 	}
 	else
@@ -599,8 +674,10 @@ int initMIC()
     .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_RX),      // Receive, not transfer
     .sample_rate = 22627,
     .bits_per_sample = I2S_BITS_PER_SAMPLE_32BIT,
-    .channel_format = I2S_CHANNEL_FMT_ONLY_RIGHT,   // although the SEL config should be left, it seems to transmit on right
-    .communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_MSB),
+    //.channel_format = I2S_CHANNEL_FMT_ONLY_RIGHT,   // although the SEL config should be left, it seems to transmit on right
+    .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT,     // Need to change this to I2S_CHANNEL_FMT_RIGHT_LEFT after updating ESP32 package to V2.0.3
+	//.communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_MSB),
+	.communication_format = I2S_COMM_FORMAT_STAND_I2S,
     .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,       // Interrupt level 1
     .dma_buf_count = 8,     // number of buffers
     .dma_buf_len = BLOCK_SIZE,      // samples per buffer

@@ -1,3 +1,50 @@
+void initIMU()
+{
+  if (new_IMU) //MPU9250
+  {
+    MPU9250Setting setting;
+    setting.accel_fs_sel = ACCEL_FS_SEL::A16G;
+    setting.gyro_fs_sel = GYRO_FS_SEL::G2000DPS;
+    setting.mag_output_bits = MAG_OUTPUT_BITS::M16BITS;
+    setting.fifo_sample_rate = FIFO_SAMPLE_RATE::SMPL_1000HZ;
+    setting.gyro_fchoice = 0x03;
+    setting.gyro_dlpf_cfg = GYRO_DLPF_CFG::DLPF_41HZ;
+    setting.accel_fchoice = 0x01;
+    setting.accel_dlpf_cfg = ACCEL_DLPF_CFG::DLPF_45HZ;
+    
+    if (!IMU1.setup(MPU9250_ADD,setting)) {  // change to your own address
+      Dprintln("MPU9250 connection failed");
+    }
+  }
+  else //ICM-20948
+  {
+    IMU.init(icmSettings);
+  }
+}
+void check_which_IMU()
+{
+  //  byte address = MPU9250_ADD;
+  byte error;
+  Wire.beginTransmission(MPU9250_ADD);
+  error = Wire.endTransmission();
+  if (error == 0)
+  {
+    new_IMU = true;
+    Dprintln("new IMU");
+    return;
+  }
+
+  byte error1;
+  Wire.beginTransmission(ICM20948_ADD);
+  error1 = Wire.endTransmission();
+  if (error1 == 0)
+  {
+    new_IMU = false;
+    Dprintln("old IMU");
+    return;
+  }
+}
+
 void interruptRoutine() {
   if (digitalRead(APDS9960_INT) == LOW)
   {
@@ -111,10 +158,26 @@ void readSensors()
     VOC = 0;
   }
 
+  //  if (accl && gyroo && magneto && !Laccl)
+  //  {
+  //    Dprintln("AGM measure");
+  //    //    IMU_read(IMU, Ax, Ay, Az, Gx, Gy, Gz, Mx, My, Mz, Itemp);  // in new lib not available
+  //    IMU_read(IMU, Ax, Ay, Az, Gx, Gy, Gz, Mx, My, Mz);
+  //    dataFormate += "asfxyzijk";
+  //  }
+  //  else
+  //  {
   if (accl)
   {
     dataFormate += "asfA";
-    IMU_read_accl(IMU, Ax, Ay, Az);
+    if (new_IMU)
+    {
+      IMU_read_accl(IMU1, Ay, Ax, Az);
+    }
+    else
+    {
+      IMU_read_accl(IMU, Ax, Ay, Az);
+    }
     A_A = sqrt((Ax * Ax) + (Ay * Ay) + (Az * Az));
   }
   else
@@ -127,7 +190,14 @@ void readSensors()
   if (gyroo)
   {
     dataFormate += "xyz";
-    IMU_read_gyro(IMU,  Gx, Gy, Gz);
+    if (new_IMU)
+    {
+      IMU_read_gyro(IMU1,  Gx, Gy, Gz);
+    }
+    else
+    {
+      IMU_read_gyro(IMU,  Gx, Gy, Gz);
+    }
   }
   else
   {
@@ -138,7 +208,14 @@ void readSensors()
   if (magneto)
   {
     dataFormate += "ijk";
-    IMU_read_magneto(IMU, Mx, My, Mz);
+    if (new_IMU)
+    {
+      IMU_read_magneto(IMU1, Mx, My, Mz);
+    }
+    else
+    {
+      IMU_read_magneto(IMU, Mx, My, Mz);
+    }
   }
   else
   {
@@ -149,7 +226,14 @@ void readSensors()
   if (Laccl)
   {
     dataFormate += "XYZL";
-    IMU_read_LinearAccl(IMU, LAx, LAy, LAz);
+    if (new_IMU)
+    {
+      IMU_read_LinearAccl(IMU1, LAy, LAx, LAz);
+    }
+    else
+    {
+      IMU_read_LinearAccl(IMU, LAx, LAy, LAz);
+    }
     A_LA = sqrt((LAx * LAx) + (LAy * LAy) + (LAz * LAz));
   }
   else
@@ -283,25 +367,25 @@ void readSensors()
         switch ( apds.readGesture() ) {
           case DIR_UP:
             {
-              Dprintln("UP");
+              Dprintln("LEFT");
               currentGesture = 1;
             }
             break;
           case DIR_DOWN:
             {
-              Dprintln("DOWN");
+              Dprintln("RIGHT");
               currentGesture = 2;
             }
             break;
           case DIR_LEFT:
             {
-              Dprintln("LEFT");
+              Dprintln("DOWN");
               currentGesture = 3;
             }
             break;
           case DIR_RIGHT:
             {
-              Dprintln("RIGHT");
+              Dprintln("UP");
               currentGesture = 4;
             }
             break;
@@ -351,6 +435,10 @@ void readSensors()
     {
       vTaskResume(buzz);
       vTaskResume(led);
+      //      RGBled.setPixelColor(0, RGBled.Color(random(0, 255), random(0, 255), random(0, 255)));
+      //      RGBled.setPixelColor(1, RGBled.Color(random(0, 255), random(0, 255), random(0, 255)));
+      //      RGBled.setPixelColor(2, RGBled.Color(random(0, 255), random(0, 255), random(0, 255)));
+      //      RGBled.show();
     }
     dataFormate += "BEV";
     batteryVTG = readBattery(true);
@@ -358,6 +446,12 @@ void readSensors()
     ESPchipID = String(ESP_getChipId());
     Dprintln(ESPchipID);
   }
+  //  else
+  //  {
+  //    batteryVTG = 0;
+  //    ESPchipID = "";
+  //  }
+
 }
 
 
@@ -369,20 +463,20 @@ String generateCsvHeader() {
   String csvHeader = "Time";
   if (accl)
   {
-    csvHeader += delimiter + "a.x" + delimiter + "a.y" + delimiter + "a.z" + delimiter + "a.a";
+    csvHeader += delimiter + "A.x" + delimiter + "A.y" + delimiter + "A.z" + delimiter + "A.a";
   }
   if (Laccl)
   {
-    csvHeader += delimiter + "la.x" + delimiter + "la.y" + delimiter + "la.z" + delimiter + "la.a";
+    csvHeader += delimiter + "LA.x" + delimiter + "LA.y" + delimiter + "LA.z" + delimiter + "LA.a";
   }
   if (gyroo)
   {
-    csvHeader += delimiter + "g.x" + delimiter + "g.y" + delimiter + "g.z";
+    csvHeader += delimiter + "G.x" + delimiter + "G.y" + delimiter + "G.z";
   }
 
   if (magneto)
   {
-    csvHeader += delimiter + "m.x" + delimiter + "m.y" + delimiter + "m.z";
+    csvHeader += delimiter + "M.x" + delimiter + "M.y" + delimiter + "M.z";
   }
 
   if (IMUtemp)
@@ -402,17 +496,17 @@ String generateCsvHeader() {
 
   if (pressure)
   {
-    csvHeader += delimiter + "pressure";
+    csvHeader += delimiter + "Pressure";
   }
 
   if (alti)
   {
-    csvHeader += delimiter + "altitude";
+    csvHeader += delimiter + "Altitude";
   }
 
   if (ambLight)
   {
-    csvHeader += delimiter + "lux";
+    csvHeader += delimiter + "LUX";
   }
 
   if (rgbLight)
@@ -434,7 +528,7 @@ String generateCsvHeader() {
   }
   if (humidity)
   {
-    csvHeader += delimiter + "humidity";
+    csvHeader += delimiter + "Humidity";
   }
   if (humidityTemp)
   {
@@ -450,7 +544,7 @@ String generateCsvHeader() {
   }
   if (noise)
   {
-    csvHeader += delimiter + "Dba";
+    csvHeader += delimiter + "dB";
   }
   csvHeader.trim();
   csvHeader += "\r\n";
@@ -686,7 +780,17 @@ void set_bot_mode()
 here:
   counter++;
   delay(50);
-  IMU_read_accl(IMU, Ax, Ay, Az);
+
+  if (new_IMU)
+  {
+    IMU_read_accl(IMU1, Ax, Ay, Az);
+  }
+  else
+  {
+    IMU_read_accl(IMU, Ax, Ay, Az);
+  }
+
+//  IMU_read_accl(IMU, Ax, Ay, Az);
   Dprint("Ax:");
   Dprintln(Ax);
   Dprint("Ay:");
@@ -711,14 +815,27 @@ here:
 
     WiFi.softAP(ssid.c_str(), password);
 
-    if (!WiFi.softAPConfig(AP_LOCAL_IP, AP_GATEWAY_IP, AP_NETWORK_MASK)) {
+    //    if (!WiFi.softAPConfig(AP_LOCAL_IP, AP_GATEWAY_IP, AP_NETWORK_MASK)) {
+    //      Dprintln("AP Config Failed");
+    //      return;
+    //    }
+    if (!WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0))) {
       Dprintln("AP Config Failed");
       return;
     }
+
     Dprint("IP address: ");
     Dprintln(WiFi.softAPIP());
+    // if DNSServer is started with "*" for domain name, it will reply with
+    // provided IP to all DNS request
+    dnsServer.start(DNS_PORT, "webserver.databot.com", apIP);
 
     delay(1000);
+    // simple HTTP server to see that DNS server is working
+    server.onNotFound([](AsyncWebServerRequest * request) {
+      request->send(SPIFFS, "/Index.html", String(), false, processor);
+    });
+
 
     server.on("/index3.html", HTTP_GET, [](AsyncWebServerRequest * request) {
       //get specific header by name
@@ -951,77 +1068,128 @@ here:
     });
 
     // all CSS files
-    server.on("/css/block.css", HTTP_GET, [](AsyncWebServerRequest * request) {
-      request->send(SPIFFS, "/css/block.css", "text/css");
-    });
-    server.on("/css/bulb-light.css", HTTP_GET, [](AsyncWebServerRequest * request) {
-      request->send(SPIFFS, "/css/bulb-light.css", "text/css");
-    });
-    server.on("/css/temp.css", HTTP_GET, [](AsyncWebServerRequest * request) {
-      request->send(SPIFFS, "/css/temp.css", "text/css");
-    });
-    server.on("/css/header-footer.css", HTTP_GET, [](AsyncWebServerRequest * request) {
-      request->send(SPIFFS, "/css/header-footer.css", "text/css");
-    });
-    server.on("/css/drone.css", HTTP_GET, [](AsyncWebServerRequest * request) {
-      request->send(SPIFFS, "/css/drone.css", "text/css");
-    });
-    server.on("/css/ssdbtn.css", HTTP_GET, [](AsyncWebServerRequest * request) {
-      request->send(SPIFFS, "/css/ssdbtn.css", "text/css");
-    });
+    server.serveStatic("/css/block.css", SPIFFS, "/css/block.css").setCacheControl("max-age=3600");
+    server.serveStatic("/css/bulb-light.css", SPIFFS, "/css/bulb-light.css").setCacheControl("max-age=3600");
+    server.serveStatic("/css/temp.css", SPIFFS, "/css/temp.css").setCacheControl("max-age=3600");
+    server.serveStatic("/css/header-footer.css", SPIFFS, "/css/header-footer.css").setCacheControl("max-age=3600");
+    server.serveStatic("/css/drone.css", SPIFFS, "/css/drone.css").setCacheControl("max-age=3600");
+    server.serveStatic("/css/ssdbtn.css", SPIFFS, "/css/ssdbtn.css").setCacheControl("max-age=3600");
 
+    /*
+      server.on("/css/block.css", HTTP_GET, [](AsyncWebServerRequest * request) {
+      request->send(SPIFFS, "/css/block.css", "text/css");
+      });
+      server.on("/css/bulb-light.css", HTTP_GET, [](AsyncWebServerRequest * request) {
+      request->send(SPIFFS, "/css/bulb-light.css", "text/css");
+      });
+      server.on("/css/temp.css", HTTP_GET, [](AsyncWebServerRequest * request) {
+      request->send(SPIFFS, "/css/temp.css", "text/css");
+      });
+      server.on("/css/header-footer.css", HTTP_GET, [](AsyncWebServerRequest * request) {
+      request->send(SPIFFS, "/css/header-footer.css", "text/css");
+      });
+      server.on("/css/drone.css", HTTP_GET, [](AsyncWebServerRequest * request) {
+      request->send(SPIFFS, "/css/drone.css", "text/css");
+      });
+      server.on("/css/ssdbtn.css", HTTP_GET, [](AsyncWebServerRequest * request) {
+      request->send(SPIFFS, "/css/ssdbtn.css", "text/css");
+      });
+    */
 
     /// all JS files
-    server.on("/js/Thermometer/ajax-library.js", HTTP_GET, [](AsyncWebServerRequest * request) {
-      request->send(SPIFFS, "/js/Thermometer/ajax-library.js", "text/javascript");
-    });
-    server.on("/js/Thermometer/temp.js", HTTP_GET, [](AsyncWebServerRequest * request) {
-      request->send(SPIFFS, "/js/Thermometer/temp.js", "text/javascript");
-    });
-    server.on("/js/Gauge/gauge.js-library.js", HTTP_GET, [](AsyncWebServerRequest * request) {
-      request->send(SPIFFS, "/js/Gauge/gauge.js-library.js", "text/javascript");
-    });
-    server.on("/js/Gauge/gauge.js", HTTP_GET, [](AsyncWebServerRequest * request) {
-      request->send(SPIFFS, "/js/Gauge/gauge.js", "text/javascript");
-    });
-    server.on("/js/ajax.js", HTTP_GET, [](AsyncWebServerRequest * request) {
-      request->send(SPIFFS, "/js/ajax.js", "text/javascript");
-    });
+    /*
+      server.serveStatic("/ajax-library.js", SPIFFS, "/ajax-library.js").setCacheControl("max-age=3600");
+      server.serveStatic("/temp.js", SPIFFS, "/temp.js").setCacheControl("max-age=3600");
+      server.serveStatic("/gauge_lib.js", SPIFFS, "/gauge_lib.js").setCacheControl("max-age=3600");
+      server.serveStatic("/gauge.js", SPIFFS, "/gauge.js").setCacheControl("max-age=3600");
+      server.serveStatic("/ajax.js", SPIFFS, "/ajax.js").setCacheControl("max-age=3600");
+    */
+    /*
+        server.on("/ajax-library.js", HTTP_GET, [](AsyncWebServerRequest * request) {
+          request->send(SPIFFS, "/ajax-library.js", "text/javascript");
+        });
+        server.on("/temp.js", HTTP_GET, [](AsyncWebServerRequest * request) {
+          request->send(SPIFFS, "/temp.js", "text/javascript");
+        });
+        server.on("/gauge_lib.js", HTTP_GET, [](AsyncWebServerRequest * request) {
+          request->send(SPIFFS, "/gauge_lib.js", "text/javascript");
+        });
+        server.on("/gauge.js", HTTP_GET, [](AsyncWebServerRequest * request) {
+          request->send(SPIFFS, "/gauge.js", "text/javascript");
+        });
+        server.on("/ajax.js", HTTP_GET, [](AsyncWebServerRequest * request) {
+          request->send(SPIFFS, "/ajax.js", "text/javascript");
+        });*/
 
+    /*
+        server.on("/js/Thermometer/ajax-library.js", HTTP_GET, [](AsyncWebServerRequest * request) {
+          request->send(SPIFFS, "/js/Thermometer/ajax-library.js", "text/javascript");
+          //      AsyncWebServerResponse *response = request->beginResponse(SPIFFS, "/js/Thermometer/ajax-library.js.gz", "text/javascript", false);
+          //      response->addHeader("Content-Encoding", "gzip");
+          //      request->send(response);
+        });
+        server.on("/js/Thermometer/temp.js", HTTP_GET, [](AsyncWebServerRequest * request) {
+          request->send(SPIFFS, "/js/Thermometer/temp.js", "text/javascript");
+        });
+        server.on("/js/Gauge/gauge.js-library.js", HTTP_GET, [](AsyncWebServerRequest * request) {
+          request->send(SPIFFS, "/js/Gauge/gauge.js-library.js", "text/javascript");
+        });
+        server.on("/js/Gauge/gauge.js", HTTP_GET, [](AsyncWebServerRequest * request) {
+          request->send(SPIFFS, "/js/Gauge/gauge.js", "text/javascript");
+        });
+        server.on("/js/ajax.js", HTTP_GET, [](AsyncWebServerRequest * request) {
+          request->send(SPIFFS, "/js/ajax.js", "text/javascript");
+        });
+    */
 
 
     /// all images
-    server.on("/dbl.png", HTTP_GET, [](AsyncWebServerRequest * request) {
-      request->send(SPIFFS, "/dbl.png", "image/png");
-    });
-    server.on("/co2.png", HTTP_GET, [](AsyncWebServerRequest * request) {
-      request->send(SPIFFS, "/co2.png", "image/png");
-    });
-    server.on("/ap.png", HTTP_GET, [](AsyncWebServerRequest * request) {
-      request->send(SPIFFS, "/ap.png", "image/png");
-    });
-    server.on("/dc.png", HTTP_GET, [](AsyncWebServerRequest * request) {
-      request->send(SPIFFS, "/dc.png", "image/png");
-    });
-    server.on("/fic.png", HTTP_GET, [](AsyncWebServerRequest * request) {
+    server.serveStatic("/s.png", SPIFFS, "/s.png").setCacheControl("max-age=36000");
+    server.serveStatic("/s2.png", SPIFFS, "/s2.png").setCacheControl("max-age=36000");
+    server.serveStatic("/fic.png", SPIFFS, "/fic.png").setCacheControl("max-age=36000");
+    /*
+      server.on("/s.png", HTTP_GET, [](AsyncWebServerRequest * request) {
+      request->send(SPIFFS, "/s.png", "image/png");
+      });
+      server.on("/s2.png", HTTP_GET, [](AsyncWebServerRequest * request) {
+      request->send(SPIFFS, "/s2.png", "image/png");
+      });
+      server.on("/fic.png", HTTP_GET, [](AsyncWebServerRequest * request) {
       request->send(SPIFFS, "/fic.png", "image/png");
-    });
-    server.on("/h.png", HTTP_GET, [](AsyncWebServerRequest * request) {
+      });
+    */
+    /*
+      server.on("/dbl.png", HTTP_GET, [](AsyncWebServerRequest * request) {
+      request->send(SPIFFS, "/dbl.png", "image/png");
+      });
+      server.on("/co2.png", HTTP_GET, [](AsyncWebServerRequest * request) {
+      request->send(SPIFFS, "/co2.png", "image/png");
+      });
+      server.on("/ap.png", HTTP_GET, [](AsyncWebServerRequest * request) {
+      request->send(SPIFFS, "/ap.png", "image/png");
+      });
+      server.on("/dc.png", HTTP_GET, [](AsyncWebServerRequest * request) {
+      request->send(SPIFFS, "/dc.png", "image/png");
+      });
+      server.on("/fic.png", HTTP_GET, [](AsyncWebServerRequest * request) {
+      request->send(SPIFFS, "/fic.png", "image/png");
+      });
+      server.on("/h.png", HTTP_GET, [](AsyncWebServerRequest * request) {
       request->send(SPIFFS, "/h.png", "image/png");
-    });
-    server.on("/voc.png", HTTP_GET, [](AsyncWebServerRequest * request) {
+      });
+      server.on("/voc.png", HTTP_GET, [](AsyncWebServerRequest * request) {
       request->send(SPIFFS, "/voc.png", "image/png");
-    });
-    server.on("/dcico.png", HTTP_GET, [](AsyncWebServerRequest * request) {
+      });
+      server.on("/dcico.png", HTTP_GET, [](AsyncWebServerRequest * request) {
       request->send(SPIFFS, "/dcico.png", "image/png");
-    });
-    server.on("/edico.png", HTTP_GET, [](AsyncWebServerRequest * request) {
+      });
+      server.on("/edico.png", HTTP_GET, [](AsyncWebServerRequest * request) {
       request->send(SPIFFS, "/edico.png", "image/png");
-    });
-    server.on("/dro.png", HTTP_GET, [](AsyncWebServerRequest * request) {
+      });
+      server.on("/dro.png", HTTP_GET, [](AsyncWebServerRequest * request) {
       request->send(SPIFFS, "/dro.png", "image/png");
-    });
-
+      });
+    */
     server.on("/index2.html", HTTP_GET, [] (AsyncWebServerRequest * request) {
       if (start_exp)
       {
@@ -1075,20 +1243,24 @@ here:
   else if (Ax < -7) //block mode on
   {
     BLOCKmode = true;
+
     Dprintln("Block mode on");
     vTaskResume(buzz);
     vTaskResume(led);
     delay(1000);
+    vTaskSuspend(led);
     vTaskSuspend(buzz);
     noTone(BUZZER_PIN, BUZZER_CHANNEL);
-    vTaskSuspend(led);
+
+
+
     RGBled.setPixelColor(0, RGBled.Color(0, 0, 0));
     RGBled.setPixelColor(1, RGBled.Color(0, 0, 0));
     RGBled.setPixelColor(2, RGBled.Color(0, 0, 0));
     RGBled.show();
 
+    delay(300);
     //add all block setup code here
-
     /////////////////////////////////////////////////////////////
   }
   else if (Ax > 7)

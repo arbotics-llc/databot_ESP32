@@ -26,9 +26,9 @@ unsigned long timestamp;
 unsigned long data_send_millis;
 
 int refresh = 100;
-byte resolution = 2;
+int resolution = 2;
 int time_factor = 1000;
-byte time_decimal = 2;
+int time_decimal = 2;
 
 long total_bytes;  // total SPIFF bytes available
 long used_bytes;   // SPIFF used bytes
@@ -86,7 +86,7 @@ boolean charging_state = false;
 float batteryVTG;
 String ESPchipID;
 
-float A_LA,A_A,LAx, LAy, LAz, Ax, Ay, Az, Gx, Gy, Gz, Mx, My, Mz, Itemp, ExtTmp1, ExtTmp2;
+float A_LA, A_A, LAx, LAy, LAz, Ax, Ay, Az, Gx, Gy, Gz, Mx, My, Mz, Itemp, ExtTmp1, ExtTmp2;
 float Pressure, Altitude, Co2, VOC, Humidity, HumTemp, Distance, Noise;
 uint16_t AmbLight, RLight, GLight, BLight;
 byte UVindex;
@@ -177,7 +177,8 @@ int wholenote = (60000 * 4) / tempo;
 int divider = 0, noteDuration = 0;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+////////////////////NEW pcb has MPU9250 instead of ICM20948
+MPU9250 IMU1;
 
 ///////////////////new IMU library code
 ArduinoICM20948 IMU;

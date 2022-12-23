@@ -20,11 +20,10 @@ source resources they have contributed to the Arduino community.
 This initial release of the databot™ library includes the following features:
 
 - Complete libraries and sample sketches required to experiment and conduct educational activities using
-the Arduino IDE with databot™ or a compatible ESP32 board with the appropriate
-sensors.
+  the Arduino IDE with databot™ or a compatible ESP32 board with the appropriate
+  sensors.
 
-- A set of sketches built and tested with the Vizeey™ app, an open source IOS/Android app that enables the creation of easy-to-use experiments for classroom use.  Vizeey™ is based on Phyphox, an open source software initiative from RWTH Aachen University.
-
+- A set of sketches built and tested with the Vizeey™ app, an open source IOS/Android app that enables the creation of easy-to-use experiments for classroom use. Vizeey™ is based on Phyphox, an open source software initiative from RWTH Aachen University.
 
 This library is released to the public under the GPL3 license and can be adapted as
 desired for any other purposes, including commercial use. Read the license for details.
@@ -33,25 +32,29 @@ in developing databot™. We ask that you buy databot™ products and recommend 
 your teacher friends to help support our continuing work!
 
 # Getting Started
+
 This is an Arduino library that you can download as a zip file and install manually or you
 can access it and install through the Arduino IDE Library manager (recommended
 method). The Arduino Library manager updates hourly so you can easily access and
-install the most current version through the IDE.
+install the most current version through the IDE. Make sure you are using Arduino ESP32 package version V2.0.4
 
 # Contributing
+
 Email us at contact@databot.us.com if you are interested in contributing to the official
 library, providing awesome sample sketches for databot™, or have suggestions. Thanks
 for your support!
 
 # License
+
 This project is licensed under the GPL3 License - see the LICENSE.md file for details
 
 # Acknowledgments
+
 - The remarkable people at Arduino.cc who continue to innovate and drive the
-most inspirational community of users on the planet.
+  most inspirational community of users on the planet.
 - Sparkfun.com - a champion for the open source movement and a major resource
-for guidance and open source code that helped make databot possible.
+  for guidance and open source code that helped make databot possible.
 - Adafruit.com - a champion for electronics education and another major resource
-that helped databot come to fruition.
+  that helped databot come to fruition.
 - Dr. Sebastian Staacks and RWTH Aaachen University for the remarkable contribution of Phyphox to the global science education community.
 - And Many others who contributed code to the Arduino ecosystem.

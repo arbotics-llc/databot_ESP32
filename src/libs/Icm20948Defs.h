@@ -378,17 +378,17 @@ extern "C" {
 #define COMPASS_SLAVEADDR_AKM_BASE      0x0C
 #define COMPASS_SLAVEADDR_AKM           0x0E
     
-#define BIT(x) ( 1 << x )              
+#define BIT_d(x) ( 1 << x )              
 
 #define ENABLE  1
 #define DISABLE 0
     
 // interrupt configurations related to HW register
-#define FSYNC_INT   BIT(7)
-#define MOTION_INT  BIT(3)
-#define PLL_INT     BIT(2)
-#define DMP_INT     BIT(1)
-#define I2C_INT     BIT(0)
+#define FSYNC_INT   BIT_d(7)
+#define MOTION_INT  BIT_d(3)
+#define PLL_INT     BIT_d(2)
+#define DMP_INT     BIT_d(1)
+#define I2C_INT     BIT_d(0)
 
 #define CHIP_AWAKE          (0x01)
 #define CHIP_LP_ENABLE      (0x02)

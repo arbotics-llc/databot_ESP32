@@ -1,11 +1,11 @@
-// ArduinoJson - arduinojson.org
-// Copyright Benoit Blanchon 2014-2019
+// ArduinoJson - https://arduinojson.org
+// Copyright © 2014-2022, Benoit BLANCHON
 // MIT License
 
 #pragma once
 
-#include "JsonDocument.hpp"
-
+// #include <ArduinoJson/Document/JsonDocument.hpp>
+#include "libs/ArduinoJson/Document/JsonDocument.hpp"
 namespace ARDUINOJSON_NAMESPACE {
 
 template <size_t desiredCapacity>
@@ -33,15 +33,20 @@ class StaticJsonDocument : public JsonDocument {
     set(src);
   }
 
-  StaticJsonDocument operator=(const StaticJsonDocument& src) {
+  StaticJsonDocument& operator=(const StaticJsonDocument& src) {
     set(src);
     return *this;
   }
 
   template <typename T>
-  StaticJsonDocument operator=(const T& src) {
+  StaticJsonDocument& operator=(const T& src) {
     set(src);
     return *this;
+  }
+
+  void garbageCollect() {
+    StaticJsonDocument tmp(*this);
+    set(tmp);
   }
 
  private:

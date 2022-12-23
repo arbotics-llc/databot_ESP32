@@ -35,18 +35,49 @@ ArduinoICM20948Settings icmSettings =
   .steps_frequency = 50               // Max frequency = 225, min frequency = 50
 };
 
+MPU9250 IMU1;          // NEW databot has MPU9250 instead of ICM20948
+
 void setup() {
 
   Serial.begin(9600);
   Wire.begin();
   Wire.setClock(400000);
-  IMU.init(icmSettings);
   RGBled.setPixelColor(0, RGBled.Color(0, 0, 255));  // LED indication to know that databot is ON
   RGBled.show();
+
+  check_which_IMU();   // it will check that IMU is MPU9250(new) or ICM-20948(old)
+  if (new_IMU) //MPU9250
+  {
+    MPU9250Setting setting;
+    setting.accel_fs_sel = ACCEL_FS_SEL::A16G;
+    setting.gyro_fs_sel = GYRO_FS_SEL::G2000DPS;
+    setting.mag_output_bits = MAG_OUTPUT_BITS::M16BITS;
+    setting.fifo_sample_rate = FIFO_SAMPLE_RATE::SMPL_1000HZ;
+    setting.gyro_fchoice = 0x03;
+    setting.gyro_dlpf_cfg = GYRO_DLPF_CFG::DLPF_41HZ;
+    setting.accel_fchoice = 0x01;
+    setting.accel_dlpf_cfg = ACCEL_DLPF_CFG::DLPF_45HZ;
+
+    if (!IMU1.setup(MPU9250_ADD, setting)) { // change to your own address
+      Dprintln("MPU9250 connection failed");
+    }
+  }
+  else //ICM-20948
+  {
+    IMU.init(icmSettings);
+  }
+
 }
 
 void loop() {
-  IMU_read_accl(IMU, acc_X, acc_Y, acc_Z);
+  if (new_IMU)
+  {
+    IMU_read_accl(IMU1, acc_Y, acc_X, acc_Z);
+  }
+  else
+  {
+    IMU_read_accl(IMU, acc_X, acc_Y, acc_Z);
+  }
   Serial.print("Acc X:");
   Serial.print(acc_X);
   Serial.print("  Acc Y:");
@@ -54,4 +85,28 @@ void loop() {
   Serial.print("  Acc Z:");
   Serial.println(acc_Z);
   delay(100);
+}
+
+void check_which_IMU()
+{
+  //  byte address = MPU9250_ADD;
+  byte error;
+  Wire.beginTransmission(MPU9250_ADD);
+  error = Wire.endTransmission();
+  if (error == 0)
+  {
+    new_IMU = true;
+    Dprintln("new IMU");
+    return;
+  }
+
+  byte error1;
+  Wire.beginTransmission(ICM20948_ADD);
+  error1 = Wire.endTransmission();
+  if (error1 == 0)
+  {
+    new_IMU = false;
+    Dprintln("old IMU");
+    return;
+  }
 }

@@ -1,11 +1,11 @@
-// ArduinoJson - arduinojson.org
-// Copyright Benoit Blanchon 2014-2019
+// ArduinoJson - https://arduinojson.org
+// Copyright © 2014-2022, Benoit BLANCHON
 // MIT License
 
 #pragma once
 
+// #include <ArduinoJson/Strings/StringAdapters.hpp>
 #include "../Strings/StringAdapters.hpp"
-
 namespace ARDUINOJSON_NAMESPACE {
 
 // A special type of data that can be used to insert pregenerated JSON portions.

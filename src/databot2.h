@@ -11,7 +11,12 @@ This program is free software: you can redistribute it and/or modify
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+/*
+ESPAsyncWebServer.h
+AsyncTCP.h
+*/
 
+#define I2C_BUFFER_LENGTH 256     //need to increase size of the i2c buffer for the distance sensor
 #ifndef DATABOT2_h
 #define DATABOT2_h
 
@@ -24,12 +29,25 @@ This program is free software: you can redistribute it and/or modify
 #endif
 
 #include <WiFi.h>
+
+//If using SPIFF for storage then uncoment below line
+#define USE_LittleFS
+
 #include <FS.h>
-#include <SPIFFS.h>
+#ifdef USE_LittleFS
+  #define SPIFFS LittleFS
+  #include <LittleFS.h> 
+#else
+  #include <SPIFFS.h>
+#endif 
+
+#include <DNSServer.h>
+#define DNS_PORT 53
 #include "libs/ESPAsyncWebServer.h"
 #include <EEPROM.h>
 
-#include<Wire.h>
+
+#include <Wire.h>
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
@@ -40,8 +58,14 @@ This program is free software: you can redistribute it and/or modify
 
 //#include "libs/ICM_20948.h" // for IMU  removed this library as we needed more features dmp from IMU after V2.5
 #include "libs/Arduino-ICM20948.h"   // new library for the IMU which supports DMP features.
-
 #define ICM_20948_ADD 0      // The value of the last bit of the I2C address.
+
+#include "libs/MPU9250.h"
+#define MPU9250_ADD 0x69
+#define ICM20948_ADD 0x68
+
+static bool new_IMU = false;
+
 #include "libs/SparkFun_APDS9960.h"
 #include "libs/SparkFun_SHTC3.h"
 #include "libs/Arduino_LPS22HB.h"
@@ -57,6 +81,8 @@ This program is free software: you can redistribute it and/or modify
 #define UV_pin 34
 #define BUZZER_PIN 32
 #define BUZZER_CHANNEL 0
+#define BUZZER_FRE 2000
+#define BUZZER_RES 8
 #define charge_state 14
 #define rx_pin 16
 #define tx_pin 17
@@ -76,7 +102,7 @@ extern std::string rxValue;
 // define the number of bytes you want to access
 #define EEPROM_SIZE 100
 
-#define ESP_getChipId()   ((uint32_t)ESP.getEfuseMac())
+//#define ESP_getChipId()   ((uint32_t)ESP.getEfuseMac())
 
 /*************************************************************************************/
 //MIC code
@@ -152,6 +178,12 @@ bool IMU_read_accl(ArduinoICM20948 &imu,float &AX,float &AY,float &AZ);
 bool IMU_read_LinearAccl(ArduinoICM20948 &imu,float &AX,float &AY,float &AZ);
 bool IMU_read_gyro(ArduinoICM20948 &imu,float &GX,float &GY,float &GZ);
 bool IMU_read_magneto(ArduinoICM20948 &imu,float &MX,float &MY,float &MZ);
+
+bool IMU_read_accl(MPU9250 &imu,float &AX,float &AY,float &AZ);
+bool IMU_read_LinearAccl(MPU9250 &imu,float &AX,float &AY,float &AZ);
+bool IMU_read_gyro(MPU9250 &imu,float &GX,float &GY,float &GZ);
+bool IMU_read_magneto(MPU9250 &imu,float &MX,float &MY,float &MZ);
+
 //bool IMU_read_temp(ArduinoICM20948 &imu,float &TMP); // not available in the new library
 
 void initLED(Adafruit_NeoPixel &led);
@@ -177,5 +209,8 @@ String EEPROMreadStringFromFlash(int startAddr);
 double RHtoAbsolute(float relHumidity, float tempC);
 uint16_t doubleToFixedPoint( double number);
 
+uint32_t ESP_getChipId();
+
+//void set_IMU(bool type);
 
 #endif

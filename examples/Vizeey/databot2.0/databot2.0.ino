@@ -1,40 +1,42 @@
-/*
+/*compiling now
   See https://databot.us.com/setup/ for more info
-  
+
   You can directly flash your databot to latest firmware from our web flashing tool check out here
   https://databot.us.com/firmware/
-  
-  All Web pages that are served by databot2.0 in WiFi mode are stored in SPIFF memory of ESP32 therefore:
-  Use Me-no-dev ESP32FS plugin to flash SPIFF web files
-  https://github.com/me-no-dev/arduino-esp32fs-plugin
+
+  All Web pages that are served by databot2.0 in WiFi mode are stored in LITTLEFS memory of ESP32 therefore:
+  Use lorol ESP32FS plugin to flash LITTLEFS web files
+  https://github.com/lorol/arduino-esp32fs-plugin
 */
 
-#define firmware_version "2.8"
+#define firmware_version "2.15"
+
 // Uncoment below line and upload code to get serial debug outputs
 //#define debug
 #include<databot2.h>
 #include"def.h"
 
+DNSServer dnsServer;
+
 DynamicJsonDocument packet(1000);
 
 OneWire oneWire(4);
 OneWire oneWire2(23);
+
 DallasTemperature tempsensor1(&oneWire);
 DallasTemperature tempsensor2(&oneWire2);
+
 SGP30 sgp30;
 
 //ICM_20948_I2C IMU; // ICM_20948_I2C object
-
 
 SparkFun_APDS9960 apds = SparkFun_APDS9960();   // light sensor object
 SHTC3 mySHTC3;    //humidity and temp          // Declare an instance of the SHTC3 class
 Adafruit_NeoPixel RGBled = Adafruit_NeoPixel(3, LED_PIN, NEO_GRB + NEO_KHZ800);
 AsyncWebServer server(80);
-/////defining the static IP for the bot
-IPAddress AP_LOCAL_IP(192, 168, 1, 160);
-IPAddress AP_GATEWAY_IP(192, 168, 1, 4);
-IPAddress AP_NETWORK_MASK(255, 255, 255, 0);
 
+/////defining the static IP for the bot
+IPAddress apIP(8, 8, 4, 4); // The default android DNS
 
 void IRAM_ATTR chargingLED();
 
@@ -53,6 +55,79 @@ String processor(const String& var) {
   {
     return env_dash_btn;
   }
+  else if (var == "acc_st" && accl)
+  {
+    return "checked";
+  }
+  else if (var == "lac_st" && Laccl)
+  {
+    return "checked";
+  }
+  else if (var == "gy_st" && gyroo)
+  {
+    return "checked";
+  }
+  else if (var == "mag_st" && magneto)
+  {
+    return "checked";
+  }
+  else if (var == "tm1_st" && externalTemp1)
+  {
+    return "checked";
+  }
+  else if (var == "tm2_st" && externalTemp2)
+  {
+    return "checked";
+  }
+  else if (var == "prs_st" && pressure)
+  {
+    return "checked";
+  }
+  else if (var == "alt_st" && alti)
+  {
+    return "checked";
+  }
+  else if (var == "amb_st" && ambLight)
+  {
+    return "checked";
+  }
+  else if (var == "rgb_st" && rgbLight)
+  {
+    return "checked";
+  }
+  else if (var == "uv_st" && uvIndex)
+  {
+    return "checked";
+  }
+  else if (var == "co_st" && co2)
+  {
+    return "checked";
+  }
+  else if (var == "voc_st" && voc)
+  {
+    return "checked";
+  }
+  else if (var == "hum_st" && humidity)
+  {
+    return "checked";
+  }
+  else if (var == "sd_st" && short_distance)
+  {
+    return "checked";
+  }
+  else if (var == "ld_st" && long_distance)
+  {
+    return "checked";
+  }
+  else if (var == "noi_st" && noise)
+  {
+    return "checked";
+  }
+  else if (var == "ref_rt")
+  {
+    return String(refresh);
+  }
+
   //  else if(var =="dronedashstate")
   //  {
   //    return drone_dash_btn;
@@ -62,7 +137,7 @@ String processor(const String& var) {
 
 
 void setup() {
-
+  
   Serial.begin(9600);
   EEPROM.begin(EEPROM_SIZE);
   delay(5);
@@ -86,6 +161,9 @@ void setup() {
   pinMode(rx_pin, INPUT);
   pinMode(tx_pin, INPUT);
 
+  ledcSetup(BUZZER_CHANNEL, BUZZER_FRE, BUZZER_RES);
+
+  check_which_IMU();   // it will check that IMU is MPU9250(new) or ICM-20948(old)
 
   //  pinMode(buzz, OUTPUT);
   //  digitalWrite(buzz, LOW);
@@ -106,22 +184,12 @@ void setup() {
   sgp30.setHumidity(doubleToFixedPoint(RHtoAbsolute(mySHTC3.toPercent(), mySHTC3.toDegC())));
 
 
-
-  ///////////old IMU code
-  /*
-    //IMU init
-    IMU.begin(Wire, ICM_20948_ADD);
-
-    Dprint(F("Initialization of the sensor returned: "));
-    Dprintln(IMU.statusString());
-    if (IMU.status != ICM_20948_Stat_Ok)
-    {
-      Dprintln("Trying again...");
-      delay(500);
-    }
-  */
   ///////////New IMU library code
-  IMU.init(icmSettings);
+  //  IMU.init(icmSettings);
+
+  
+  initIMU();
+
 
   pinMode(APDS9960_INT, INPUT);
 
@@ -131,10 +199,12 @@ void setup() {
   } else {
     Dprintln(F("Something went wrong during APDS-9960 init!"));
   }
+
   apds.setAmbientLightGain(0);
   apds.setGestureGain(0);
   apds.setLEDDrive(3);
   apds.setGestureLEDDrive(3);
+
 
   //  // Start running the APDS-9960 light sensor (no interrupts)
   //  if ( apds.enableLightSensor(false) ) {
@@ -142,8 +212,6 @@ void setup() {
   //  } else {
   //    Dprintln(F("Something went wrong during light sensor init!"));
   //  }
-
-
 
   if (!BARO.begin()) {
     Dprintln("Failed to initialize pressure sensor!");
@@ -200,6 +268,11 @@ void setup() {
 
 void loop() {
 
+  if (WiFimode)
+  {
+    dnsServer.processNextRequest();
+  }
+
   while (BLOCKmode)
   {
     // all loop  code in block mode add here
@@ -214,7 +287,7 @@ void loop() {
     RGBled.show();
     delay(5000);
   }
-  else if(DCmode)
+  else if (DCmode)
   {
     return;
   }
@@ -229,6 +302,10 @@ void loop() {
       while (millis() - data_send_millis < refresh)
       {
         // do nothing just wait
+        if(new_IMU && (accl || gyroo || magneto || Laccl))
+        {
+          IMU1.update();
+        }
       }
       data_send_millis = millis();
       form_packet();

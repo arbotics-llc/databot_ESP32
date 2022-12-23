@@ -21,6 +21,7 @@ void creatTask()
     0); /* Core where the task should run */
 
   vTaskSuspend(led);
+
 }
 
 
@@ -80,6 +81,5 @@ void Task2code( void * parameter ) {
     RGBled.setPixelColor(2, RGBled.Color(255, 0, 0));
     RGBled.show();
     delay(100);
-
   }
 }
