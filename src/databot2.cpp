@@ -973,7 +973,7 @@ int readBattery(bool percentage)
 	//float voltage = ((adcVAL/4095)*3.3)*1000;
 	float voltage = (adcVAL*3.3*2.12)/4095;        // have voltage divider so multiplication factor should be 2 but added 0.12 to compensate error in vtg reading 
 	int vtg = voltage*100; 
-	vtg = map(vtg, 360, 420, 0, 100);
+	vtg = map(vtg, 360, 416, 0, 100);
 	if(vtg<0)
 	{
 		vtg = 0;

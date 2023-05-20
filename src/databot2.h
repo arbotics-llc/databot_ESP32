@@ -72,7 +72,8 @@ static bool new_IMU = false;
 #include <driver/i2s.h>
 #include "libs/arduinoFFT.h"
 #include "libs/vl53l1_api.h"
-#include "libs/Adafruit_NeoPixel.h"
+//#include "libs/Adafruit_NeoPixel.h"
+#include <Adafruit_NeoPixel.h>
 #include "libs/Tone32.h"
 #include "libs/Filter.h"
 
