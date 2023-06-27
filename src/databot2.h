@@ -165,11 +165,14 @@ void sendPacket(const char *);    		// will send char packets over BLE
 std::string getValues();           		// will receive the value over BLE and returns in string
 byte getUV(); 							// will read the UV sensor and returns the uv index 
 float getPressure();   					// will read the pressre and returns pressure value in Hpa
+float getPressure_temperature();        //will read temperature in C from pressure sensor
 float getAltitude();					// will read the altitude based on pressure reading returns value in meter
 void callback_Rx();
 
 //DS18B20 external temperature sensor helper function
 float getExternalTemperature(DallasTemperature &tempsensor);
+
+float get_heatIndex(float curTemp, float curHumidity);
 
 // no temperature data available in new library
 //bool IMU_read(ArduinoICM20948 &imu,float &AX,float &AY,float &AZ,float &GX,float &GY,float &GZ,float &MX,float &MY,float &MZ,float &TMP);

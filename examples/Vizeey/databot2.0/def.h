@@ -11,13 +11,14 @@ String STOPbtn = "disabled";
 String env_dash_btn = "";
 //String drone_dash_btn = "";
 
+//bool new_IMU = false;
 bool env_dash_en = false;
 
 bool WiFimode = false;
 bool BLEmode = false;
-bool BLOCKmode = false;
-bool DCmode = false;
-bool wifi_no_connect = false;
+//bool BLOCKmode = false;
+//bool DCmode = false;
+//bool wifi_no_connect = false;
 
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
@@ -42,12 +43,21 @@ bool reset_APDS9960 = false;
 bool Laccl = false;
 bool accl = false;
 bool gyroo = false;
+bool Agyro = false;
+float absoluteAngularVelocity = 0;
+
 bool magneto = false;
 bool IMUtemp = false;
 bool externalTemp1 = false;
 bool externalTemp2 = false;
+bool heat_index1 = false;
+//bool heat_index2 = false;
+//bool buzzz = false;
+//int buzz_freq = 0;
 
 bool pressure = false;
+bool Ptemp = false;
+
 float altiCalib;
 float pastAltiCalib;
 float newAltiCalib;
@@ -87,7 +97,7 @@ float batteryVTG;
 String ESPchipID;
 
 float A_LA, A_A, LAx, LAy, LAz, Ax, Ay, Az, Gx, Gy, Gz, Mx, My, Mz, Itemp, ExtTmp1, ExtTmp2;
-float Pressure, Altitude, Co2, VOC, Humidity, HumTemp, Distance, Noise;
+float heat_index, PreTemp, Pressure, Altitude, Co2, VOC, Humidity, HumTemp, Distance, Noise;
 uint16_t AmbLight, RLight, GLight, BLight;
 byte UVindex;
 byte rx_state, tx_state;
@@ -131,6 +141,7 @@ const char* HUM_TEMP  = "humidityTemp";
 const char* S_DIS  = "short_distance";
 const char* L_DIS  = "long_distance";
 const char* NOISE  = "noise";
+const char* AMBIENT_T = "ambTemp";
 const char* M1 = "m1";
 const char* M2 = "m2";
 const char* M3 = "m3";
@@ -166,6 +177,8 @@ int melody[] = {
   NOTE_FS5, -16, NOTE_DS5, 8,  NOTE_DS5, 32, NOTE_E5, 32,  NOTE_F5, 32,
   NOTE_F5, 32,  NOTE_FS5, 32,  NOTE_G5, 32,  NOTE_G5, 32, NOTE_GS5, 32,  NOTE_A5, 16, NOTE_B5, 8
 };
+
+
 
 // sizeof gives the number of bytes, each int value is composed of two bytes (16 bits)
 // there are two values per note (pitch and duration), so for each note there are four bytes

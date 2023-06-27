@@ -1,4 +1,4 @@
-/*compiling now
+/*
   See https://databot.us.com/setup/ for more info
 
   You can directly flash your databot to latest firmware from our web flashing tool check out here
@@ -8,11 +8,12 @@
   Use lorol ESP32FS plugin to flash LITTLEFS web files
   https://github.com/lorol/arduino-esp32fs-plugin
 */
+//compiling again
+#define firmware_version "2.18"
 
-#define firmware_version "2.15"
-
-// Uncoment below line and upload code to get serial debug outputs
+//Uncoment below line and upload code to get serial debug outputs
 //#define debug
+
 #include<databot2.h>
 #include"def.h"
 
@@ -37,6 +38,10 @@ AsyncWebServer server(80);
 
 /////defining the static IP for the bot
 IPAddress apIP(8, 8, 4, 4); // The default android DNS
+
+//IPAddress AP_LOCAL_IP(192, 168, 1, 160);
+//IPAddress AP_GATEWAY_IP(192, 168, 1, 4);
+//IPAddress AP_NETWORK_MASK(255, 255, 255, 0);
 
 void IRAM_ATTR chargingLED();
 
@@ -120,6 +125,10 @@ String processor(const String& var) {
     return "checked";
   }
   else if (var == "noi_st" && noise)
+  {
+    return "checked";
+  }
+  else if(var == "ambTemp" && Ptemp)
   {
     return "checked";
   }
@@ -273,24 +282,24 @@ void loop() {
     dnsServer.processNextRequest();
   }
 
-  while (BLOCKmode)
-  {
-    // all loop  code in block mode add here
+//  while (BLOCKmode)
+//  {
+//    // all loop  code in block mode add here
+//
+//    ///////////////////////////////////////
+//  }
 
-    ///////////////////////////////////////
-  }
-
-  if (DCmode && WiFi.status() != WL_CONNECTED)
-  {
-    wifi_no_connect = true;
-    RGBled.setPixelColor(0, RGBled.Color(255, 0, 0));
-    RGBled.show();
-    delay(5000);
-  }
-  else if (DCmode)
-  {
-    return;
-  }
+//  if (DCmode && WiFi.status() != WL_CONNECTED)
+//  {
+//    wifi_no_connect = true;
+//    RGBled.setPixelColor(0, RGBled.Color(255, 0, 0));
+//    RGBled.show();
+//    delay(5000);
+//  }
+//  else if (DCmode)
+//  {
+//    return;
+//  }
 
 
   readSensors();

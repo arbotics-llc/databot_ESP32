@@ -11,8 +11,8 @@ void initIMU()
     setting.gyro_dlpf_cfg = GYRO_DLPF_CFG::DLPF_41HZ;
     setting.accel_fchoice = 0x01;
     setting.accel_dlpf_cfg = ACCEL_DLPF_CFG::DLPF_45HZ;
-    
-    if (!IMU1.setup(MPU9250_ADD,setting)) {  // change to your own address
+
+    if (!IMU1.setup(MPU9250_ADD, setting)) { // change to your own address
       Dprintln("MPU9250 connection failed");
     }
   }
@@ -205,6 +205,46 @@ void readSensors()
     Gy = 0;
     Gz = 0;
   }
+
+  if (Agyro) // absalute angular velocity
+  {
+    dataFormate += "M";
+    if (new_IMU)
+    {
+      IMU_read_gyro(IMU1,  Gx, Gy, Gz);
+    }
+    else
+    {
+      IMU_read_gyro(IMU,  Gx, Gy, Gz);
+    }
+
+    absoluteAngularVelocity = sqrt(pow(Gx, 2) + pow(Gy, 2) + pow(Gz, 2));
+
+    /*
+
+
+        // Calculate time since last loop iteration
+        dt = (millis() - Agyro_millis) / 1000.0;
+        Agyro_millis = millis();
+        // Integrate gyro data to get angular velocity
+        float deltaGyroX = (Gx + prevGyroX) / 2.0 * dt;
+        float deltaGyroY = (Gy + prevGyroY) / 2.0 * dt;
+        float deltaGyroZ = (Gz + prevGyroZ) / 2.0 * dt;
+
+        absoluteAngularVelocity += sqrt(deltaGyroX * deltaGyroX + deltaGyroY * deltaGyroY + deltaGyroZ * deltaGyroZ);
+
+        // Store current gyro values for next iteration
+        prevGyroX = Gx;
+        prevGyroY = Gy;
+        prevGyroZ = Gz;
+    */
+  }
+  else
+  {
+    absoluteAngularVelocity = 0;
+  }
+
+
   if (magneto)
   {
     dataFormate += "ijk";
@@ -301,6 +341,16 @@ void readSensors()
     humidityTemp = 0;
   }
 
+  if (heat_index1)
+  {
+    dataFormate += "I";
+    heat_index = get_heatIndex(ExtTmp1, humidity);
+  }
+  else
+  {
+    heat_index = 0;
+  }
+
 
   if (uvIndex)
   {
@@ -322,6 +372,17 @@ void readSensors()
   {
     Pressure = 0;
   }
+
+  if (Ptemp)
+  {
+    dataFormate += "P";
+    PreTemp = getPressure_temperature() - 18.5; // will get pressure in Kpa so *10 for hPa
+  }
+  else
+  {
+    PreTemp = 0;
+  }
+
   if (alti)
   {
     dataFormate += "e";
@@ -358,7 +419,7 @@ void readSensors()
   if (gesture)
   {
     dataFormate += "G";
-    if ( gestureInt)
+    if (gestureInt)
     {
       detachInterrupt(APDS9960_INT);
       gestureInt = false;
@@ -446,6 +507,11 @@ void readSensors()
     ESPchipID = String(ESP_getChipId());
     Dprintln(ESPchipID);
   }
+
+  //  if (buzzz && start_exp)
+  //  {
+  //    vTaskResume(buzz);
+  //  }
   //  else
   //  {
   //    batteryVTG = 0;
@@ -473,7 +539,10 @@ String generateCsvHeader() {
   {
     csvHeader += delimiter + "G.x" + delimiter + "G.y" + delimiter + "G.z";
   }
-
+  if (Agyro)
+  {
+    csvHeader += delimiter + "AGyro";
+  }
   if (magneto)
   {
     csvHeader += delimiter + "M.x" + delimiter + "M.y" + delimiter + "M.z";
@@ -497,6 +566,11 @@ String generateCsvHeader() {
   if (pressure)
   {
     csvHeader += delimiter + "Pressure";
+  }
+
+  if (Ptemp)
+  {
+    csvHeader += delimiter + "Ambient Temperature";
   }
 
   if (alti)
@@ -534,6 +608,10 @@ String generateCsvHeader() {
   {
     csvHeader += delimiter + "HUM Temp";
   }
+  if (heat_index1)
+  {
+    csvHeader += delimiter + "Heat Index";
+  }
   if (short_distance)
   {
     csvHeader += delimiter + "S Distance";
@@ -568,7 +646,10 @@ String generateCsvRecord() {
   {
     csvRecord += delimiter + Gx + delimiter + Gy + delimiter + Gz;
   }
-
+  if (Agyro)
+  {
+    csvRecord += delimiter + absoluteAngularVelocity;
+  }
   if (magneto)
   {
     csvRecord += delimiter + Mx + delimiter + My + delimiter + Mz;
@@ -592,6 +673,11 @@ String generateCsvRecord() {
   if (pressure)
   {
     csvRecord += delimiter + Pressure;
+  }
+
+  if (Ptemp)
+  {
+    csvRecord += delimiter + PreTemp;
   }
 
   if (alti)
@@ -629,6 +715,10 @@ String generateCsvRecord() {
   {
     csvRecord += delimiter + HumTemp;
   }
+  if (heat_index1)
+  {
+    csvRecord += delimiter + heat_index;
+  }
   if (short_distance)
   {
     csvRecord += delimiter + Distance;
@@ -658,6 +748,12 @@ void reset_config()
     noTone(BUZZER_PIN, BUZZER_CHANNEL);
     vTaskSuspend(led);
   }
+  //  if (buzzz)
+  //  {
+  //    vTaskSuspend(buzz);
+  //    noTone(BUZZER_PIN, BUZZER_CHANNEL);
+  //  }
+  noTone(BUZZER_PIN, BUZZER_CHANNEL);
   RGBled.setPixelColor(0, RGBled.Color(0, 0, 0));
   RGBled.setPixelColor(1, RGBled.Color(0, 0, 0));
   RGBled.setPixelColor(2, RGBled.Color(0, 0, 0));
@@ -682,6 +778,7 @@ void reset_config()
   Laccl = false;
   accl = false;
   gyroo = false;
+  Agyro = false;
   magneto = false;
   IMUtemp = false;
   externalTemp1 = false;
@@ -695,6 +792,8 @@ void reset_config()
   voc = false;
   humidity = false;
   humidityTemp = false;
+  heat_index1 = false;
+
   short_distance = false;
   long_distance = false;
   noise = false;
@@ -724,14 +823,15 @@ void LED_breadh()
     blink_milli = millis();
     if (!brighter)
     {
-      if (breadhColor < 255 && !DCmode)
+      //      if (breadhColor < 255 && !DCmode)
+      if (breadhColor < 255)
       {
         breadhColor++;
       }
-      else if (breadhColor < 128 && DCmode)
-      {
-        breadhColor++;
-      }
+      //      else if (breadhColor < 128 && DCmode)
+      //      {
+      //        breadhColor++;
+      //      }
       else
       {
         brighter = true;
@@ -756,10 +856,10 @@ void LED_breadh()
     {
       RGBled.setPixelColor(0, RGBled.Color(0, breadhColor, 0));
     }
-    else if (DCmode)
-    {
-      RGBled.setPixelColor(0, RGBled.Color(breadhColor, 0, breadhColor));
-    }
+    //    else if (DCmode)
+    //    {
+    //      RGBled.setPixelColor(0, RGBled.Color(breadhColor, 0, breadhColor));
+    //    }
 
     if (charging_state)
     {
@@ -790,7 +890,7 @@ here:
     IMU_read_accl(IMU, Ax, Ay, Az);
   }
 
-//  IMU_read_accl(IMU, Ax, Ay, Az);
+  //  IMU_read_accl(IMU, Ax, Ay, Az);
   Dprint("Ax:");
   Dprintln(Ax);
   Dprint("Ay:");
@@ -836,81 +936,81 @@ here:
       request->send(SPIFFS, "/Index.html", String(), false, processor);
     });
 
-
-    server.on("/index3.html", HTTP_GET, [](AsyncWebServerRequest * request) {
-      //get specific header by name
-      int params = request->params();
-      bool reset_once = true;
-      if (env_dash_en)
-      {
-        reset_config();
-      }
-      for (int i = 0; i < params; i++) {
-        if (reset_once)
-        {
-          reset_once = false;
-          reset_config();
-        }
-        AsyncWebParameter* p = request->getParam(i);
-        if (p->name() == M1)
-        {
-          //Mission 1 selected
-          Dprintln("start M1");
-          co2 = true;
-          alti  = true;
-          humidity = true;
-          externalTemp1  = true;
-          ambLight  = true;
-          Light_config_again = true;
-        }
-        else if (p->name() == M2)
-        {
-          //Mission 2 selected
-          Dprintln("start M2");
-          magneto = true;
-          TOF_config_again = true;
-          long_distance = true;
-        }
-        else if (p->name() == M3)
-        {
-          //Mission 3 selected
-          Dprintln("start M3");
-          TOF_config_again = true;
-          long_distance = true;
-          rgbLight = true;
-          Light_config_again = true;
-        }
-        else if (p->name() == M4)
-        {
-          //Mission 4 selected
-          Dprintln("start M4");
-          TOF_config_again = true;
-          long_distance = true;
-        }
-        else if (p->name() == PARAM_start_btn)
-        {
-          Dprintln("Start exp");
-          RGBled.setPixelColor(0, RGBled.Color(0, 255, 0));
-          RGBled.setPixelColor(2, RGBled.Color(0, 0, 0));
-          RGBled.show();
-          start_exp = true;
-          resetTime = true;
-          sendCSVheader = true;
-          STARTbtn = "disabled";
-          env_dash_btn = "disabled";
-          STOPbtn = "";
-        }
-        else if (p->name() == PARAM_stop_btn)
-        {
-          ///  experiment storage will stop because its alredy reset in the start of this function due to that start_exp becomed false
-          STOPbtn = "disabled";
-          STARTbtn = "";
-          env_dash_btn = "";
-        }
-      }
-      request->send(SPIFFS, "/index3.html", String(), false, processor);
-    });
-
+    /*
+        server.on("/index3.html", HTTP_GET, [](AsyncWebServerRequest * request) {
+          //get specific header by name
+          int params = request->params();
+          bool reset_once = true;
+          if (env_dash_en)
+          {
+            reset_config();
+          }
+          for (int i = 0; i < params; i++) {
+            if (reset_once)
+            {
+              reset_once = false;
+              reset_config();
+            }
+            AsyncWebParameter* p = request->getParam(i);
+            if (p->name() == M1)
+            {
+              //Mission 1 selected
+              Dprintln("start M1");
+              co2 = true;
+              alti  = true;
+              humidity = true;
+              externalTemp1  = true;
+              ambLight  = true;
+              Light_config_again = true;
+            }
+            else if (p->name() == M2)
+            {
+              //Mission 2 selected
+              Dprintln("start M2");
+              magneto = true;
+              TOF_config_again = true;
+              long_distance = true;
+            }
+            else if (p->name() == M3)
+            {
+              //Mission 3 selected
+              Dprintln("start M3");
+              TOF_config_again = true;
+              long_distance = true;
+              rgbLight = true;
+              Light_config_again = true;
+            }
+            else if (p->name() == M4)
+            {
+              //Mission 4 selected
+              Dprintln("start M4");
+              TOF_config_again = true;
+              long_distance = true;
+            }
+            else if (p->name() == PARAM_start_btn)
+            {
+              Dprintln("Start exp");
+              RGBled.setPixelColor(0, RGBled.Color(0, 255, 0));
+              RGBled.setPixelColor(2, RGBled.Color(0, 0, 0));
+              RGBled.show();
+              start_exp = true;
+              resetTime = true;
+              sendCSVheader = true;
+              STARTbtn = "disabled";
+              env_dash_btn = "disabled";
+              STOPbtn = "";
+            }
+            else if (p->name() == PARAM_stop_btn)
+            {
+              ///  experiment storage will stop because its alredy reset in the start of this function due to that start_exp becomed false
+              STOPbtn = "disabled";
+              STARTbtn = "";
+              env_dash_btn = "";
+            }
+          }
+          request->send(SPIFFS, "/index3.html", String(), false, processor);
+        });
+    */
     server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
       //get specific header by name
       int params = request->params();
@@ -955,7 +1055,13 @@ here:
         }
         else if (p->name() == EX_TEMP2)
         {
+
           externalTemp2  = true;
+        }
+        else if (p->name() == AMBIENT_T)
+        {
+          pressure = true;
+          Ptemp = true;
         }
         else if (p->name() == PRESS)
         {
@@ -1240,45 +1346,45 @@ here:
     });
     server.begin();
   }
-  else if (Ax < -7) //block mode on
-  {
-    BLOCKmode = true;
-
-    Dprintln("Block mode on");
-    vTaskResume(buzz);
-    vTaskResume(led);
-    delay(1000);
-    vTaskSuspend(led);
-    vTaskSuspend(buzz);
-    noTone(BUZZER_PIN, BUZZER_CHANNEL);
-
-
-
-    RGBled.setPixelColor(0, RGBled.Color(0, 0, 0));
-    RGBled.setPixelColor(1, RGBled.Color(0, 0, 0));
-    RGBled.setPixelColor(2, RGBled.Color(0, 0, 0));
-    RGBled.show();
-
-    delay(300);
-    //add all block setup code here
-    /////////////////////////////////////////////////////////////
-  }
-  else if (Ax > 7)
-  {
-    DCmode = true;
-    WiFi.begin(WiFi_SSID.c_str(), WiFi_PSS.c_str());
-    unsigned long tempmillis = millis();
-    while (WiFi.status() != WL_CONNECTED && millis() - tempmillis <= 20000 ) {
-      Dprint(".");
-      LED_breadh();
-    }
-    if (WiFi.status() == WL_CONNECTED)
-    {
-      Dprintln("**");
-      RGBled.setPixelColor(0, RGBled.Color(128, 0, 128));
-      RGBled.show();
-    }
-  }
+  //  else if (Ax < -7) //block mode on
+  //  {
+  //    BLOCKmode = true;
+  //
+  //    Dprintln("Block mode on");
+  //    vTaskResume(buzz);
+  //    vTaskResume(led);
+  //    delay(1000);
+  //    vTaskSuspend(led);
+  //    vTaskSuspend(buzz);
+  //    noTone(BUZZER_PIN, BUZZER_CHANNEL);
+  //
+  //
+  //
+  //    RGBled.setPixelColor(0, RGBled.Color(0, 0, 0));
+  //    RGBled.setPixelColor(1, RGBled.Color(0, 0, 0));
+  //    RGBled.setPixelColor(2, RGBled.Color(0, 0, 0));
+  //    RGBled.show();
+  //
+  //    delay(300);
+  //    //add all block setup code here
+  //    /////////////////////////////////////////////////////////////
+  //  }
+  //  else if (Ax > 7)
+  //  {
+  //    DCmode = true;
+  //    WiFi.begin(WiFi_SSID.c_str(), WiFi_PSS.c_str());
+  //    unsigned long tempmillis = millis();
+  //    while (WiFi.status() != WL_CONNECTED && millis() - tempmillis <= 20000 ) {
+  //      Dprint(".");
+  //      LED_breadh();
+  //    }
+  //    if (WiFi.status() == WL_CONNECTED)
+  //    {
+  //      Dprintln("**");
+  //      RGBled.setPixelColor(0, RGBled.Color(128, 0, 128));
+  //      RGBled.show();
+  //    }
+  //  }
   else if (Az > 7 || counter == 4) //BLE mode on
   {
     BLEmode = true;
@@ -1339,6 +1445,9 @@ void form_packet()
   packet[F("Z")] = LAz;
   packet[F("A")] = A_A;   // absalute accleration
   packet[F("L")] = A_LA;  // absalute linear accleration
+  packet[F("P")] = PreTemp; // pressure temperature
+  packet[F("I")] = heat_index; // heat index
+  packet[F("M")] = absoluteAngularVelocity; // absalute gyro angular velocity
 
   if (BLEmode)
   {

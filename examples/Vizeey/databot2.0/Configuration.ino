@@ -29,6 +29,7 @@ void callback_Rx()
       externalTemp1 = doc["Etemp1"];
       externalTemp2 = doc["Etemp2"];
       pressure = doc["pressure"];
+      Ptemp = doc["Ptemp"];
       alti = doc["alti"];
       ambLight = doc["ambLight"];
       rgbLight = doc["rgbLight"];
@@ -37,6 +38,14 @@ void callback_Rx()
       voc = doc["voc"];
       humidity = doc["hum"];
       humidityTemp = doc["humTemp"];
+      Agyro = doc["Agyro"];
+      heat_index1 = doc["HI1"];
+      if (heat_index1)
+      {
+        humidity = true;
+        externalTemp1 = true;
+      }
+
       short_distance = doc["Sdist"];
       long_distance = doc["Ldist"];
       noise = doc["noise"];
@@ -46,7 +55,14 @@ void callback_Rx()
       altitudeCalibrate = doc["altCalib"];
       humCalib = doc["humCalib"];
       DtmpCal = doc["DtmpCal"];
-
+      JsonObject buz = doc["buz"];
+      bool buzzz = buz["state"];
+      if (buzzz)
+      {
+        int frequency =  buz["f"];
+        int duration = buz["d"];
+        tone(BUZZER_PIN, frequency, duration, BUZZER_CHANNEL);
+      }
       JsonObject led1 = doc["led1"];
       bool led1_state = led1["state"]; // true
       if (led1_state)
@@ -107,7 +123,6 @@ void callback_Rx()
         resetTime = true;
       }
       sendCSVheader = true;
-
     }
   }
   else
@@ -166,7 +181,7 @@ void callback_Rx()
     else if (DtmpCal)
     {
       if (rxValue == "1.0")
-      {     
+      {
         newTempCalib = ExtTmp1;
         if (newTempCalib != pastTempCalib)
         {

@@ -237,6 +237,34 @@ float getExternalTemperature(DallasTemperature &tempsensor) {
   return temperature;
 }
 
+
+float get_heatIndex(float curTemp, float curHumidity)
+{
+	//Reference: https://www.wpc.ncep.noaa.gov/html/heatindex_equation.shtml
+	//curTemp = current temp in degrees F; curHumidity = relative humidity in percent; both type float
+  curTemp = curTemp* 9/5;
+	//Use short formula if less than 80
+  float shortHi = 0.5 * (curTemp + 61 + ((curTemp - 68) * 1.2) + (curHumidity * 0.094));
+  if((shortHi + curTemp) / 2 < 80) {
+    return shortHi;
+  }
+  
+  //Otherwise use long version
+  float hi = -42.379 + (2.04901523 * curTemp) + (10.14333127 * curHumidity) - (0.22475541 * curTemp * curHumidity) - 
+             (6.83783 * pow(10,-3) * pow(curTemp,2)) - (5.481717 * pow(10,-2) * pow(curHumidity,2)) +
+             (1.22874 * pow(10,-3) * pow(curTemp,2) * curHumidity) + (8.5282 * pow(10,-4) * curTemp * pow(curHumidity,2)) -
+             (1.99 * pow(10,-6) * pow(curTemp,2) * pow(curHumidity, 2));
+  float adj = 0.0;
+
+  if(curHumidity < 13) {
+    adj = ((13 - curHumidity) / 4) * sqrt((17 - abs(curTemp - 95)) / 17);
+  }
+  else if(curHumidity > 85 && curTemp >= 80 && curTemp <= 87) {
+    adj = ((curHumidity - 85) / 10) * ((87 - curTemp) / 5);
+  }
+  
+  return hi - adj;
+}
 /*
 	Function: IMU_read
 	Type: bool
@@ -341,7 +369,7 @@ bool IMU_read_accl(ArduinoICM20948 &imu,float &AX,float &AY,float &AZ)
 	if (imu.accelDataIsReady())
 	{
 		imu.readAccelData(&a, &b, &c);
-		AX = a*9.80665;
+		AX = a*9.80665*(-1);  // added -1 to match the new IMU values
 		AY = b*9.80665;
 		AZ = c*9.80665;
 		return true;
@@ -392,7 +420,7 @@ bool IMU_read_gyro(ArduinoICM20948 &imu,float &GX,float &GY,float &GZ)
 	if (imu.gyroDataIsReady())
 	{
 		imu.readGyroData(&a, &b, &c);
-		GX=a;
+		GX=a*(-1);    // added -1 to match the new IMU values
 		GY=b;
 		GZ=c;
 		return true;
@@ -407,8 +435,11 @@ bool IMU_read_gyro(MPU9250 &imu,float &GX,float &GY,float &GZ)
 {
 	if (imu.update())
 	{
-		GX=imu.getGyroX();
-		GY=imu.getGyroY();
+		//GX=imu.getGyroX();
+		//GY=imu.getGyroY();
+		//swaping them
+		GY=imu.getGyroX();
+		GX=imu.getGyroY();
 		GZ=imu.getGyroZ();
 		return true;
 	}
@@ -443,7 +474,7 @@ bool IMU_read_magneto(ArduinoICM20948 &imu,float &MX,float &MY,float &MZ)
 	if (imu.magDataIsReady())
 	{
 		imu.readMagData(&a, &b, &c);
-		MX=a;
+		MX=a*(-1) ;   // added -1 to match the new IMU values
 		MY=b;
 		MZ=c;
 		return true;
@@ -457,8 +488,11 @@ bool IMU_read_magneto(MPU9250 &imu,float &MX,float &MY,float &MZ)
 {
 	if (imu.update())
 	{
-		MX=imu.getMagX();
-		MY=imu.getMagY();
+		//MX=imu.getMagX();
+		//MY=imu.getMagY();
+		//swaping them
+		MY=imu.getMagX();
+		MX=imu.getMagY();
 		MZ=imu.getMagZ();
 		return true;
 	}
@@ -588,6 +622,15 @@ float getPressure()
 	return BARO.readPressure();
 }
 
+/*
+	function: getPressure_temperature()
+	type: float
+	will read the temperature from pressure sensor values in C is returned.
+*/
+float getPressure_temperature()
+{
+	return BARO.readTemperature();
+}
 /*
 	function: getAltitude()
 	type: float
@@ -973,7 +1016,7 @@ int readBattery(bool percentage)
 	//float voltage = ((adcVAL/4095)*3.3)*1000;
 	float voltage = (adcVAL*3.3*2.12)/4095;        // have voltage divider so multiplication factor should be 2 but added 0.12 to compensate error in vtg reading 
 	int vtg = voltage*100; 
-	vtg = map(vtg, 360, 420, 0, 100);
+	vtg = map(vtg, 360, 415, 0, 100);
 	if(vtg<0)
 	{
 		vtg = 0;
